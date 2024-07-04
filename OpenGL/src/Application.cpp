@@ -83,23 +83,25 @@ static ShaderProgramSources ParseShader(const std::string& filepath)
 	return { ss[0].str(),ss[1].str() };
 }
 
-static unsigned int CompileShader(unsigned int type, const std::string& source)
+static GLuint CompileShader(GLuint type, const std::string& source)
 {
     //unsigned int id = glCreateShader(GL_VERTEX_SHADER);
-    unsigned int id = glCreateShader(type);
+    GLuint id = glCreateShader(type);
 
-    const char* src = source.c_str();
+    const GLchar* src = source.c_str();
     glShaderSource(id, 1, &src, nullptr);
     glCompileShader(id);
 
     // Error handling
-    int result;
+    GLint result;
+    // glGetShaderiv检查是否编译成功
     glGetShaderiv(id, GL_COMPILE_STATUS, &result);
     if (result == GL_FALSE) {
-        int length;
+        GLint length;
         glGetShaderiv(id, GL_INFO_LOG_LENGTH, &length);
         //char message[length]; 会报错，因为length是变量而不是常量，不能在栈上分配此大小(堆上可以)
-		char* message = (char*)alloca(length * sizeof(char));
+		GLchar* message = (GLchar*)alloca(length * sizeof(GLchar));
+        // glGetShaderInfoLog获取错误消息
 		glGetShaderInfoLog(id, length, &length, message);
 		std::cout << "Failed to compile " << (type == GL_VERTEX_SHADER ? "vertex" : "fragment") << "shader!" << std::endl;
 		std::cout << message << std::endl;
@@ -110,21 +112,21 @@ static unsigned int CompileShader(unsigned int type, const std::string& source)
     return id;
 }
 
-static unsigned int CreateShader(const std::string& vertexShader, const std::string& fragmentShader)
+static GLuint CreateShader(const std::string& vertexShader, const std::string& fragmentShader)
 {
-    unsigned int program = glCreateProgram();
-    unsigned int vs = CompileShader(GL_VERTEX_SHADER, vertexShader);
-    unsigned int fs = CompileShader(GL_FRAGMENT_SHADER, fragmentShader);
+    GLuint shaderProgram = glCreateProgram();
+    GLuint vs = CompileShader(GL_VERTEX_SHADER, vertexShader);
+    GLuint fs = CompileShader(GL_FRAGMENT_SHADER, fragmentShader);
 
-    glAttachShader(program, vs);
-    glAttachShader(program, fs);
-    glLinkProgram(program);
-    glValidateProgram(program);
+    glAttachShader(shaderProgram, vs);
+    glAttachShader(shaderProgram, fs);
+    glLinkProgram(shaderProgram);
+    glValidateProgram(shaderProgram);
 
     glDeleteShader(vs);
     glDeleteShader(fs);
 
-    return program;
+    return shaderProgram;
 }
 
 int main(void)
@@ -169,22 +171,28 @@ int main(void)
     };
 
     // index buffer 索引缓冲区
-    unsigned int indices[] = {
+    GLuint indices[] = {
         0, 1, 2, 
         2, 3, 0
     };
 
     // 顶点缓冲区
-    unsigned int buffer;
+    GLuint buffer;
+    // 使用glGenBuffers函数和一个缓冲ID生成一个 顶点缓冲对象(Vertex Buffer Objects, VBO)
     GLCall(glGenBuffers(1, &buffer));
     GLCall(glBindBuffer(GL_ARRAY_BUFFER, buffer));
+    // 把之前定义的顶点数据复制到缓冲的内存中
+    // 第四个参数指定了我们希望显卡如何管理给定的数据。它有三种形式：
+        // GL_STATIC_DRAW ：数据不会或几乎不会改变。
+        // GL_DYNAMIC_DRAW：数据会被改变很多。
+        // GL_STREAM_DRAW ：数据每次绘制时都会改变。
     GLCall(glBufferData(GL_ARRAY_BUFFER, sizeof(positions), positions, GL_STATIC_DRAW));
 
-    GLCall(glEnableVertexAttribArray(0));
-    GLCall(glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0));
+    GLCall(glEnableVertexAttribArray(0)); // 启用顶点属性
+    GLCall(glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 2, (GLvoid*)0)); // 告诉OpenGL该如何解析顶点数据（应用到逐个顶点属性上）
 
     // index buffer object
-    unsigned int ibo;
+    GLuint ibo;
     GLCall(glGenBuffers(1, &ibo));
     GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo));
     GLCall(glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW));
@@ -222,12 +230,12 @@ int main(void)
     std::cout << source.VertexSource << std::endl;
     std::cout << "FRAGMENT" << std::endl;
     std::cout << source.FragmentSource << std::endl;
-
-    unsigned int shader = CreateShader(source.VertexSource, source.FragmentSource);
-    GLCall(glUseProgram(shader));
+  
+    GLuint shaderProgram = CreateShader(source.VertexSource, source.FragmentSource);
+    GLCall(glUseProgram(shaderProgram)); // 在glUseProgram函数调用之后，每个着色器调用和渲染调用都会使用这个程序对象
 
     // 获取统一变量的 location
-    GLCall(int location = glGetUniformLocation(shader, "u_Color"));
+    GLCall(int location = glGetUniformLocation(shaderProgram, "u_Color"));
     ASSERT(location != -1); // location 为 -1 意味着没有找到想要的统一变量(uniform)
     GLCall(glUniform4f(location, 0.2f, 0.3f, 0.8f, 1.0f));
 
@@ -273,7 +281,7 @@ int main(void)
     }
 
     //
-    glDeleteProgram(shader);
+    glDeleteProgram(shaderProgram);
 
     glfwTerminate();
     return 0;
