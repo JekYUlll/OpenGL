@@ -18,11 +18,13 @@ VertexBuffer::~VertexBuffer()
     GLCall(glDeleteBuffers(1, &_rendererID));
 }
 
+// °ó¶¨ vertex buffer
 void VertexBuffer::Bind() const
 {
     GLCall(glBindBuffer(GL_ARRAY_BUFFER, _rendererID));
 }
 
+// ½â°ó vertex buffer
 void VertexBuffer::UnBind() const
 {
     GLCall(glBindBuffer(GL_ARRAY_BUFFER, 0));

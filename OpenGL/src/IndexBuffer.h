@@ -14,6 +14,7 @@ public:
 	void Bind() const;
 	void UnBind() const;
 
+	// 获取索引个数
 	inline unsigned int GetCount() const { return _count; }
 
 };
