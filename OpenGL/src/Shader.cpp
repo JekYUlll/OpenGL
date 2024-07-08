@@ -4,20 +4,20 @@ Shader::Shader(const std::string& filepath)
 	: _filepath(filepath), _rendererID(0)
 {
     ShaderProgramSources source = ReadShader(filepath);
-    this->_rendererID = CreateShader(source.VertexSource, source.VertexSource);
+    this->_rendererID = CreateShader(source.VertexSource, source.FragmentSource);
 }
 
 Shader::Shader(const GLchar* vertexPath, const GLchar* fragmentPath)
 {
     ShaderProgramSources source = ReadShader(vertexPath, fragmentPath);
-    this->_rendererID = CreateShader(source.VertexSource, source.VertexSource);
+    this->_rendererID = CreateShader(source.VertexSource, source.FragmentSource);
 }
 
 Shader::Shader(const std::string& vertexShader, const std::string& fragmentShader, bool isDirect)
     : _filepath(""), _rendererID(0)
 {
     ShaderProgramSources source = { vertexShader, fragmentShader };
-    this->_rendererID = CreateShader(source.VertexSource, source.VertexSource);
+    this->_rendererID = CreateShader(source.VertexSource, source.FragmentSource);
 }
 
 Shader::~Shader()
@@ -28,12 +28,11 @@ Shader::~Shader()
 // 读取并切分shader文件
 ShaderProgramSources Shader::ReadShader(const std::string& filepath)
 {
-    std::ifstream stream(filepath);
+    std::ifstream stream(filepath); //
     if (!stream)
-    {
         throw std::runtime_error("Failed to open shader file: " + filepath);
-    }
-    stream.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+
+    // stream.exceptions(std::ifstream::failbit | std::ifstream::badbit);
 
     enum class ShaderType
     {
@@ -41,31 +40,37 @@ ShaderProgramSources Shader::ReadShader(const std::string& filepath)
     };
 
     std::string line;
-    std::stringstream ss[2];
+    std::string ss[2];
     ShaderType type = ShaderType::NONE;
 
-    try {
-        while (std::getline(stream, line))
-        {
-            if (line.find("#shader") != std::string::npos) {
-                if (line.find("vertex") != std::string::npos) {
-                    type = ShaderType::VERTEX;
-                }
-                else if (line.find("fragment") != std::string::npos) {
-                    type = ShaderType::FRAGMENT;
-                }
-            }
-            else {
-                ss[(int)type] << line << '\n';
-            }
-        }
-    } catch (const std::ifstream::failure& e) {
-        std::cerr << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ" << std::endl;
-        std::cerr << "Failed to read shader file: " << filepath << std::endl;
-        std::cerr << e.what() << std::endl;
-        throw std::runtime_error("Shader file read error: " + filepath);
-    }
-    return { ss[0].str(), ss[1].str() };
+	try {
+		static unsigned int lineNum = 0; // 行数，debug用
+		while (std::getline(stream, line))
+		{
+			lineNum++;
+
+			if (line.find("#shader") != std::string::npos) {
+				if (line.find("vertex") != std::string::npos) {
+					type = ShaderType::VERTEX;
+				}
+				else if (line.find("fragment") != std::string::npos) {
+					type = ShaderType::FRAGMENT;
+				}
+			}
+			else {
+                std::cout << "[line:" << lineNum << "] " << "[type:" << (int)type << "]   " << line << std::endl << std::endl; // 打印本行shader，debug用
+				ss[(int)type] += line + '\n';
+			}
+		}
+	}
+	catch (const std::ifstream::failure& e) {
+		std::cerr << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ" << std::endl;
+		std::cerr << "Failed to read shader file: " << filepath << std::endl;
+		std::cerr << e.what() << std::endl;
+		throw std::runtime_error("Shader file read error: " + filepath);
+	}
+    // return { ss[0].str(), ss[1].str() };
+    return { ss[0], ss[1] };
 }
 
 ShaderProgramSources Shader::ReadShader(const GLchar* vertexPath, const GLchar* fragmentPath)
@@ -98,14 +103,12 @@ ShaderProgramSources Shader::ReadShader(const GLchar* vertexPath, const GLchar* 
     {
         std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ" << std::endl;
     }
-
     return { vertexCode, fragmentCode };
 }
 
 
 unsigned int Shader::CompileShader(unsigned int type, const std::string& source)
 {
-    //unsigned int id = glCreateShader(GL_VERTEX_SHADER);
     unsigned int id = glCreateShader(type);
 
     const char* src = source.c_str();
@@ -132,9 +135,9 @@ unsigned int Shader::CompileShader(unsigned int type, const std::string& source)
 
 void Shader::PrintShader(const std::string& vertexShader, const std::string& fragmentShader)
 {
-    std::cout << "VERTEX" << std::endl;
-    std::cout << vertexShader << std::endl;
-    std::cout << "FRAGMENT" << std::endl;
+    std::cout << "[VERTEX]" << std::endl;
+    std::cout << vertexShader << std::endl << std::endl;
+    std::cout << "[FRAGMENT]" << std::endl;
     std::cout << fragmentShader << std::endl;
 }
 

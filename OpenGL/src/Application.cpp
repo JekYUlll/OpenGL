@@ -38,9 +38,10 @@ static void PrintInitInfo() {
     // 打印分辨率
     std::cout << "resolution: " << WIDTH << " * " << HEIGHT << std::endl;
     // 打印顶点属性上限
-    GLint nrAttributes;
+    GLint nrAttributes = 0;
     glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &nrAttributes);
-    std::cout << "maximum nr of vertex attributes supported: " << nrAttributes << std::endl << std::endl;
+    std::cout << "maximum nr of vertex attributes supported: " << nrAttributes << std::endl;
+    std::cout << "  <=====================================>" << std::endl << std::endl;
 }
 
 int main(void)
@@ -56,7 +57,7 @@ int main(void)
     SetVersion(3, 3, true);
 
     /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(WIDTH, HEIGHT, "Cherno OpenGL", NULL, NULL);
+    window = glfwCreateWindow(WIDTH, HEIGHT, "Learn OpenGL", NULL, NULL);
     if (!window)
     {
         glfwTerminate();
@@ -103,17 +104,18 @@ int main(void)
         VertexBuffer vb(vertices, sizeof(vertices)); // VertexBuffer对象
 
         VertexBufferLayout layout;
-        layout.Push<float>(3); // Cherno 是 2 我此处需要分别为位置和颜色调用Push
-        layout.Push<float>(3); 
+        // Cherno 是 2 我此处需要分别为位置和颜色调用Push
+        layout.Push<float>(3); // 前三个float是position
+        layout.Push<float>(3); // 4-6的float是color
         va.AddBuffer(vb, layout);
 
         // IndexBuffer对象
         IndexBuffer ib(indices, sizeof(indices) / sizeof(GLuint)); // Cherno第二个参数直接写的6
 
         std::string basicShaderPath = "res/shaders/Basic.shader"; // basic的相对路径
-        std::string basicAbsolutePath = "F:/Program/_VS/OpenGL/OpenGL/res/shaders/Basic.shader"; // basic的绝对路径
-        std::string vertexPath = "res/shaders/3ct_vertex.shader";
-        std::string fragmentPath = "res/shaders/3ct_fragment.shader";
+        //std::string basicAbsolutePath = "F:/Program/_VS/OpenGL/OpenGL/res/shaders/Basic.shader"; // basic的绝对路径
+        //std::string vertexPath = "res/shaders/3ct_vertex.shader";
+        //std::string fragmentPath = "res/shaders/3ct_fragment.shader";
 
         //Shader basicShader(vertexPath.c_str(), fragmentPath.c_str()); // 两个文件分开读取
 

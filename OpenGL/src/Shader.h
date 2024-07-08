@@ -1,11 +1,14 @@
 #pragma once
 #define SHADER_H
 
+//#define DEBUG_SS
+
+#include <iostream>
 #include <string>
 #include <fstream>
 #include <sstream>
-#include <iostream>
 #include <unordered_map>
+#include <stdexcept>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include "Debug.hpp"
@@ -34,7 +37,7 @@ public:
     void Bind() const;
     void Unbind() const;
 
-    // todo: 1.此处可用template，传入更多类型。 2.可以接入数学库，方便传入向量
+    // todo: 1.此处可用template，传入更多类型。 2.可以接入数学库，方便传入向量 3.写更多的设置函数
     void SetUniform4f(const std::string& name, float v0, float v1, float v2, float v3);
 
 private:
