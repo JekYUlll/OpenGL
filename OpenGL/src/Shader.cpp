@@ -31,16 +31,14 @@ ShaderProgramSources Shader::ReadShader(const std::string& filepath)
     std::ifstream stream(filepath); //
     if (!stream)
         throw std::runtime_error("Failed to open shader file: " + filepath);
-
-    // stream.exceptions(std::ifstream::failbit | std::ifstream::badbit);
-
+    stream.exceptions(std::ifstream::badbit); //stream.exceptions(std::ifstream::failbit | std::ifstream::badbit);会无差别在末尾抛出异常
     enum class ShaderType
     {
         NONE = -1, VERTEX = 0, FRAGMENT = 1
     };
 
     std::string line;
-    std::string ss[2];
+    std::stringstream ss[2];
     ShaderType type = ShaderType::NONE;
 
 	try {
@@ -58,8 +56,10 @@ ShaderProgramSources Shader::ReadShader(const std::string& filepath)
 				}
 			}
 			else {
+#ifdef DEBUG_SS
                 std::cout << "[line:" << lineNum << "] " << "[type:" << (int)type << "]   " << line << std::endl << std::endl; // 打印本行shader，debug用
-				ss[(int)type] += line + '\n';
+#endif // DEBUG_SS
+				ss[(int)type] << line << '\n';
 			}
 		}
 	}
@@ -69,8 +69,7 @@ ShaderProgramSources Shader::ReadShader(const std::string& filepath)
 		std::cerr << e.what() << std::endl;
 		throw std::runtime_error("Shader file read error: " + filepath);
 	}
-    // return { ss[0].str(), ss[1].str() };
-    return { ss[0], ss[1] };
+    return { ss[0].str(), ss[1].str() };
 }
 
 ShaderProgramSources Shader::ReadShader(const GLchar* vertexPath, const GLchar* fragmentPath)
