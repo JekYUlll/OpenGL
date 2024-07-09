@@ -1,8 +1,6 @@
 #pragma once
 #define SHADER_H
 
-#define DEBUG_SS
-
 #include <iostream>
 #include <string>
 #include <fstream>

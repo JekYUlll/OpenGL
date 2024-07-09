@@ -158,7 +158,9 @@
   <ItemGroup>
     <ClInclude Include="src\Debug.hpp" />
     <ClInclude Include="src\IndexBuffer.h" />
+    <ClInclude Include="src\Init.h" />
     <ClInclude Include="src\KeyControll.hpp" />
+    <ClInclude Include="src\pch.h" />
     <ClInclude Include="src\Renderer.h" />
     <ClInclude Include="src\Shader.h" />
     <ClInclude Include="src\VertexArray.h" />

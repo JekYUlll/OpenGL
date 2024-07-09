@@ -31,7 +31,8 @@ ShaderProgramSources Shader::ReadShader(const std::string& filepath)
     std::ifstream stream(filepath); //
     if (!stream)
         throw std::runtime_error("Failed to open shader file: " + filepath);
-    stream.exceptions(std::ifstream::badbit); //stream.exceptions(std::ifstream::failbit | std::ifstream::badbit);会无差别在末尾抛出异常
+    stream.exceptions(std::ifstream::badbit); // stream.exceptions(std::ifstream::failbit | std::ifstream::badbit);会无差别在末尾抛出异常
+    
     enum class ShaderType
     {
         NONE = -1, VERTEX = 0, FRAGMENT = 1
@@ -135,7 +136,7 @@ unsigned int Shader::CompileShader(unsigned int type, const std::string& source)
 void Shader::PrintShader(const std::string& vertexShader, const std::string& fragmentShader)
 {
     std::cout << "[VERTEX]" << std::endl;
-    std::cout << vertexShader << std::endl << std::endl;
+    std::cout << vertexShader << std::endl;
     std::cout << "[FRAGMENT]" << std::endl;
     std::cout << fragmentShader << std::endl;
 }

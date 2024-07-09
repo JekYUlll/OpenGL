@@ -1,5 +1,6 @@
 #pragma once
 #define DEBUG_HPP
+
 #include <iostream>
 #include <GL/glew.h>
 

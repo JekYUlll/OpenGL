@@ -64,5 +64,11 @@
     <ClInclude Include="src\VertexBufferLayout.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="src\pch.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Init.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
