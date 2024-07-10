@@ -1,6 +1,5 @@
-#pragma once
+#ifndef SHADER_H
 #define SHADER_H
-
 #include <iostream>
 #include <string>
 #include <fstream>
@@ -9,7 +8,7 @@
 #include <stdexcept>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
-#include "Debug.hpp"
+#include "Debug.h"
 
 struct ShaderProgramSources
 {
@@ -37,6 +36,8 @@ public:
 
     // todo: 1.此处可用template，传入更多类型。 2.可以接入数学库，方便传入向量 3.写更多的设置函数
     void SetUniform4f(const std::string& name, float v0, float v1, float v2, float v3);
+    void SetUniform1f(const std::string& name, float value);
+    void SetUniform1i(const std::string& name, int value);
 
 private:
     unsigned int CreateShader(const std::string& vertexShader, const std::string& fragmentShader);
@@ -46,6 +47,8 @@ private:
     unsigned int CompileShader(unsigned int type, const std::string& source);
     void PrintShader(const std::string& vertexShader, const std::string& fragmentShader); // 自己加的，打印shader
 };
+
+#endif // !SHADER_H
 
 
 

@@ -1,8 +1,9 @@
-#pragma once
+#ifndef VERTEXBUFFERLAYOUT_HPP
 #define VERTEXBUFFERLAYOUT_HPP
+
 #include <vector>
 #include <GL/glew.h>
-#include "Debug.hpp"
+#include "Debug.h"
 
 struct VertexBufferElement
 {
@@ -67,3 +68,5 @@ public:
 	inline const std::vector<VertexBufferElement>& GetElements() const { return this->_elements; } // Cherno此处未返回引用而是拷贝
 	inline unsigned int GetStride() const { return this->_stride; }
 };
+
+#endif // !VERTEXBUFFERLAYOUT_HPP

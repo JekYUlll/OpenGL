@@ -1,4 +1,5 @@
-#pragma once
+#ifndef PCH_H
+#define PCH_H
 
 #ifndef GLEW_STATIC
 #define GLEW_STATIC
@@ -8,10 +9,6 @@
 #define DEBUG
 #endif // !DEBUG
 
-#ifndef DEBUG_SS // 流的debug，逐行输出shader文件 // 在此处定义似乎没生效
-#define DEBUG_SS
-#endif // !DEBUG_SS
-
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -20,19 +17,24 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-#include "Debug.hpp"
-#include "Init.h"
+#include "Debug.h"
+#include "Init.hpp"
 #include "Renderer.h"
 #include "VertexBuffer.h"
 #include "VertexArray.h"
 #include "IndexBuffer.h"
 #include "Shader.h"
-
-#include <boost/algorithm/algorithm.hpp>
-
-#define KETINPUT
-
-#ifdef KETINPUT
+#include "Texture.h"
+//#define STB_IMAGE_IMPLEMENTATION
+//#include "vender/stb_image/stb_image.h"
+//#include <boost/algorithm/algorithm.hpp>
 #include "KeyControll.hpp"
-#endif // KETINPUT
+// 色彩
+#define PURE_WHITE 1.0f, 1.0f, 1.0f
+#define PURE_BLACK NULL
+#define PURE_RED 1.0f, 0.0f, 0.0f
+#define PRE_GREEN 0.0f, 1.0f, 0.0f
+#define PURE_BLUE 0.0f, 0.0f, 1.0f
+#define ARMY_GREEN 0.16f, 0.26f, 0.20f // 军绿
 
+#endif // !PCH_H

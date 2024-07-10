@@ -33,17 +33,24 @@
     <ClCompile Include="src\VertexArray.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="src\Texture.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\vender\stb_image\stb_image.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Debug.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="res\shaders\Basic.shader" />
-    <None Include="res\shaders\3ct_fragment.shader" />
-    <None Include="res\shaders\3ct_vertex.shader" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Renderer.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="src\Debug.hpp">
+    <ClInclude Include="src\Debug.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="src\VertexBuffer.h">
@@ -67,8 +74,34 @@
     <ClInclude Include="src\pch.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="src\Init.h">
+    <ClInclude Include="src\Init.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="src\vender\stb_image\stb_image.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Texture.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\textures\setsuna.png">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\textures\pathetic.png">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\textures\calm.png">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\textures\awesomeface.png">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\textures\nerida.png">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\icon\chris.png">
+      <Filter>资源文件</Filter>
+    </Image>
   </ItemGroup>
 </Project>

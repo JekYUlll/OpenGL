@@ -1,6 +1,7 @@
-#pragma once
+#ifndef VERTEXBUFFER_H
 #define VERTEXBUFFER_H
-#include "Debug.hpp"
+
+#include "Debug.h"
 
 class VertexBuffer
 {
@@ -13,3 +14,5 @@ public:
 	void Bind() const;
 	void UnBind() const;
 };
+
+#endif // !VERTEXBUFFER_H

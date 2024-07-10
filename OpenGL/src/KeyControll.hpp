@@ -1,6 +1,5 @@
-#pragma once
+#ifndef KEYCONTROLL_HPP
 #define KEYCONTROLL_HPP
-
 #include <iostream>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -34,3 +33,5 @@ namespace kcb
 		}
 	}
 }
+
+#endif // !KEYCONTROLL_HPP

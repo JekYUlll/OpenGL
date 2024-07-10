@@ -1,17 +1,20 @@
-#pragma once
-
+#ifndef INIT_HPP
+#define INIT_HPP
 #include <iostream>
-
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
-
-#include "Debug.hpp"
+#include "Debug.h"
 #include "KeyControll.hpp"
+#include "vender/stb_image/stb_image.h"
+
+// 取消GLCall，加速初始化
+#ifdef DEBUG
+#undef DEBUG
+#endif // DEBUG
 
 namespace init {
-    //static unsigned int WIDTH, HEIGHT;
-    
-    static void SetVersion(const unsigned int& versionNum_1, const unsigned int& versionNum_2, const bool& isCore)
+    // 设置版本
+    void SetVersion(const unsigned int& versionNum_1, const unsigned int& versionNum_2, const bool& isCore)
     {
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, versionNum_1); // 主版本
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, versionNum_2); // 次版本
@@ -22,7 +25,7 @@ namespace init {
     }
 
     // 打印初始信息
-    static void PrintInitInfo(const unsigned int& width, const unsigned int& height) {
+    void PrintInitInfo(const unsigned int& width, const unsigned int& height) {
         // 打印版本号
         std::cout << "GLEW version: " << glGetString(GL_VERSION) << std::endl;
         // 打印分辨率
@@ -33,17 +36,17 @@ namespace init {
         std::cout << "maximum nr of vertex attributes supported: " << nrAttributes << std::endl;
         std::cout << "  <=====================================>" << std::endl << std::endl;
     }
-
     /// <summary>
     /// 初始化GLEW和GLFW，创建窗口
     /// </summary>
+    /// <param name="windowName">窗口标题</param>
     /// <param name="width">窗口宽度</param>
     /// <param name="height">窗口高度</param>
     /// <param name="versionNum_1">主版本号</param>
     /// <param name="versionNum_2">次版本号</param>
     /// <param name="isCore">是否为OpenGL core</param>
     /// <returns>窗口指针</returns>
-    static GLFWwindow* Init(const unsigned int& width, const unsigned int& height, const unsigned int& versionNum_1, const unsigned int& versionNum_2, const bool& isCore)
+    GLFWwindow* Init(const std::string& windowName, const unsigned int& width, const unsigned int& height, const unsigned int& versionNum_1, const unsigned int& versionNum_2, const bool& isCore)
     {
         GLFWwindow* window;
         /* Initialize the library */
@@ -51,9 +54,9 @@ namespace init {
             std::cout << "Failed to init GLFW!" << std::endl;
             std::abort(); // 用法可能不太对
         }
-        init::SetVersion(3, 3, true);
+        init::SetVersion(versionNum_1, versionNum_2, isCore);
         /* Create a windowed mode window and its OpenGL context */
-        window = glfwCreateWindow(width, height, "Learn OpenGL", NULL, NULL);
+        window = glfwCreateWindow(width, height, windowName.c_str(), NULL, NULL);
         if (!window) {
             glfwTerminate();
             std::cout << "Failed to create window!" << std::endl;
@@ -73,4 +76,22 @@ namespace init {
         PrintInitInfo(width, height);
         return window;
     }
+    // 设置图标
+    void SetWindowIcon(GLFWwindow* window, const std::string& iconPath) {
+        int width, height, channels;
+        unsigned char* pixels = stbi_load(iconPath.c_str(), &width, &height, &channels, 4);
+        if (pixels) {
+            GLFWimage icon;
+            icon.width = width;
+            icon.height = height;
+            icon.pixels = pixels;
+            glfwSetWindowIcon(window, 1, &icon);
+            stbi_image_free(pixels);
+        }
+        else {
+            std::cerr << "Failed to load icon image: " << iconPath << std::endl;
+        }
+    }
 }
+
+#endif // !INIT_HPP

@@ -14,6 +14,11 @@ void Renderer::Clear()
 	GLCall(glClear(GL_COLOR_BUFFER_BIT));
 }
 
+void Renderer::SetBgColor(float r, float g, float b, float a = 1.0f)
+{
+	GLCall(glClearColor(r, g, b, a));
+}
+
 void Renderer::SetBgColor(float r, float g, float b)
 {
 	GLCall(glClearColor(r, g, b, 1.0f));

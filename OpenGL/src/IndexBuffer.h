@@ -1,6 +1,6 @@
-#pragma once
+#ifndef INDEXBUFFER_H
 #define INDEXBUFFER_H
-#include "Debug.hpp"
+#include "Debug.h"
 
 class IndexBuffer 
 {
@@ -16,5 +16,6 @@ public:
 
 	// 获取索引个数
 	inline unsigned int GetCount() const { return _count; }
-
 };
+
+#endif // !INDEXBUFFER_H
