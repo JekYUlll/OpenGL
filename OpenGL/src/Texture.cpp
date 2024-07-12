@@ -1,7 +1,7 @@
 #define DEBUG
 #include "Texture.h"
 //#define STB_IMAGE_IMPLEMENTATION
-#include "vender/stb_image/stb_image.h"
+#include "stb_image/stb_image.h"
 
 Texture::Texture(const std::string& filePath)
 	: _rendererID(0), _filePath(filePath), _localBuffer(nullptr), _width(0), _height(0), _BPP(0)

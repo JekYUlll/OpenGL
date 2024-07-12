@@ -8,9 +8,11 @@ layout(location = 2) in vec2 aTexCoord;
 out vec3 ourColor;
 out vec2 TexCoord;
 
+uniform mat4 u_MVP;
+
 void main()
 {
-    gl_Position = vec4(aPos, 1.0);
+    gl_Position = u_MVP * vec4(aPos, 1.0);
     ourColor = aColor;
     TexCoord = aTexCoord;
 }
@@ -30,6 +32,5 @@ void main()
     vec4 texColor1 = texture(ourTexture1, TexCoord);
     vec4 texColor2 = texture(ourTexture2, TexCoord);
     vec4 mixedColor = mix(texColor1, texColor2, 0.2) * vec4(ourColor, 1.0);
-
-    FragColor = mixedColor * vec4(ourColor, 1.0); // 或者使用 texColor2 或者 mixedColor 查看不同阶段的颜色值
+    FragColor = mixedColor;
 }

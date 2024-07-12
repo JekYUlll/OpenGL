@@ -5,7 +5,8 @@
 #include <GLFW/glfw3.h>
 #include "Debug.h"
 #include "KeyControll.hpp"
-#include "vender/stb_image/stb_image.h"
+#include "stb_image/stb_image.h"
+#include "Gui.h"
 
 // 取消GLCall，加速初始化
 #ifdef DEBUG
@@ -14,7 +15,7 @@
 
 namespace init {
     // 设置版本
-    void SetVersion(const unsigned int& versionNum_1, const unsigned int& versionNum_2, const bool& isCore)
+    void SetOpenGLVersion(const unsigned int& versionNum_1, const unsigned int& versionNum_2, const bool& isCore)
     {
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, versionNum_1); // 主版本
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, versionNum_2); // 次版本
@@ -27,13 +28,13 @@ namespace init {
     // 打印初始信息
     void PrintInitInfo(const unsigned int& width, const unsigned int& height) {
         // 打印版本号
-        std::cout << "GLEW version: " << glGetString(GL_VERSION) << std::endl;
+        std::cout << "OpenGL version: " << glGetString(GL_VERSION) << std::endl;
         // 打印分辨率
         std::cout << "Resolution: " << width << " * " << height << std::endl;
         // 打印顶点属性上限
         GLint nrAttributes = 0;
         glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &nrAttributes);
-        std::cout << "maximum nr of vertex attributes supported: " << nrAttributes << std::endl;
+        std::cout << "Maximum nr of vertex attributes supported: " << nrAttributes << std::endl;
         std::cout << "  <=====================================>" << std::endl << std::endl;
     }
     /// <summary>
@@ -54,7 +55,7 @@ namespace init {
             std::cout << "Failed to init GLFW!" << std::endl;
             std::abort(); // 用法可能不太对
         }
-        init::SetVersion(versionNum_1, versionNum_2, isCore);
+        init::SetOpenGLVersion(versionNum_1, versionNum_2, isCore);
         /* Create a windowed mode window and its OpenGL context */
         window = glfwCreateWindow(width, height, windowName.c_str(), NULL, NULL);
         if (!window) {
@@ -76,7 +77,7 @@ namespace init {
         PrintInitInfo(width, height);
         return window;
     }
-    // 设置图标
+    // 设置窗口图标
     void SetWindowIcon(GLFWwindow* window, const std::string& iconPath) {
         int width, height, channels;
         unsigned char* pixels = stbi_load(iconPath.c_str(), &width, &height, &channels, 4);

@@ -9,6 +9,7 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include "Debug.h"
+#include "glm/glm.hpp"
 
 struct ShaderProgramSources
 {
@@ -38,6 +39,7 @@ public:
     void SetUniform4f(const std::string& name, float v0, float v1, float v2, float v3);
     void SetUniform1f(const std::string& name, float value);
     void SetUniform1i(const std::string& name, int value);
+    void SetUniformMat4f(const std::string& name, const glm::mat4& matrix);
 
 private:
     unsigned int CreateShader(const std::string& vertexShader, const std::string& fragmentShader);

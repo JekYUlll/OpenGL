@@ -5,10 +5,6 @@
 #define GLEW_STATIC
 #endif // !GLEW_STATIC
 
-#ifndef DEBUG
-#define DEBUG
-#endif // !DEBUG
-
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -16,6 +12,12 @@
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+
+#include <imgui/imgui.h>
+#include <imgui/imgui_impl_glfw.h>
+#include <imgui/imgui_impl_opengl3.h>
+
+#include "Gui.h"
 
 #include "Debug.h"
 #include "Init.hpp"
@@ -25,10 +27,11 @@
 #include "IndexBuffer.h"
 #include "Shader.h"
 #include "Texture.h"
-//#define STB_IMAGE_IMPLEMENTATION
-//#include "vender/stb_image/stb_image.h"
 //#include <boost/algorithm/algorithm.hpp>
 #include "KeyControll.hpp"
+
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 // É«²Ê
 #define PURE_WHITE 1.0f, 1.0f, 1.0f
 #define PURE_BLACK NULL
