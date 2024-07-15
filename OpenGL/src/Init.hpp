@@ -53,7 +53,7 @@ namespace init {
         /* Initialize the library */
         if (!glfwInit()) {
             std::cout << "Failed to init GLFW!" << std::endl;
-            std::abort(); // 用法可能不太对
+            return nullptr;
         }
         init::SetOpenGLVersion(versionNum_1, versionNum_2, isCore);
         /* Create a windowed mode window and its OpenGL context */
@@ -61,7 +61,7 @@ namespace init {
         if (!window) {
             glfwTerminate();
             std::cout << "Failed to create window!" << std::endl;
-            std::abort();
+            return nullptr;
         }
         /* Make the window's context current */
         glfwMakeContextCurrent(window);
@@ -72,7 +72,7 @@ namespace init {
         // 初始化 GLEW
         if (glewInit() != GLEW_OK) {
             std::cout << "GLEW init Error!" << std::endl;
-            std::abort();
+            return nullptr;
         }
         PrintInitInfo(width, height);
         return window;

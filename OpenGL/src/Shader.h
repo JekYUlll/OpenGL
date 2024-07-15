@@ -41,13 +41,14 @@ public:
     void SetUniform1i(const std::string& name, int value);
     void SetUniformMat4f(const std::string& name, const glm::mat4& matrix);
 
+    void PrintShader(const std::string& vertexShader, const std::string& fragmentShader); // 自己加的，打印shader
+
 private:
     unsigned int CreateShader(const std::string& vertexShader, const std::string& fragmentShader);
     int GetUniformLocation(const std::string& name);
     ShaderProgramSources ReadShader(const std::string& filepath); //cherno为ParseShader，此处改为read，并加入重载版本
     ShaderProgramSources ReadShader(const GLchar* vertexPath, const GLchar* fragmentPath); // 分别从两个路径读取
     unsigned int CompileShader(unsigned int type, const std::string& source);
-    void PrintShader(const std::string& vertexShader, const std::string& fragmentShader); // 自己加的，打印shader
 };
 
 #endif // !SHADER_H

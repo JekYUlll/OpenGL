@@ -610,25 +610,11 @@
     <ClInclude Include="src\vendor\imgui\imstb_rectpack.h" />
     <ClInclude Include="src\vendor\imgui\imstb_textedit.h" />
     <ClInclude Include="src\vendor\imgui\imstb_truetype.h" />
+    <ClInclude Include="src\vendor\OBJ\OBJ_Loader.h" />
     <ClInclude Include="src\vendor\stb_image\stb_image.h" />
     <ClInclude Include="src\VertexArray.h" />
     <ClInclude Include="src\VertexBuffer.h" />
     <ClInclude Include="src\VertexBufferLayout.hpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="res\icon\chris.png" />
-    <Image Include="res\icon\opengl.png" />
-    <Image Include="res\icon\OpenGL_logo.png" />
-    <Image Include="res\textures\02asuka.png" />
-    <Image Include="res\textures\asuka.jpg" />
-    <Image Include="res\textures\awesomeface.png" />
-    <Image Include="res\textures\calm.png" />
-    <Image Include="res\textures\dots.png" />
-    <Image Include="res\textures\nerida.png" />
-    <Image Include="res\textures\pathetic.png" />
-    <Image Include="res\textures\setsuna.png" />
-    <Image Include="res\textures\t.png" />
-    <Image Include="res\textures\zzz.png" />
   </ItemGroup>
   <ItemGroup>
     <Font Include="res\font\consola.ttf" />

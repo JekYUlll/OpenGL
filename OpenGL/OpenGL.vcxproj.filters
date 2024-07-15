@@ -1418,47 +1418,9 @@
     <ClInclude Include="src\Gui.h">
       <Filter>头文件</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="res\textures\setsuna.png">
-      <Filter>资源文件</Filter>
-    </Image>
-    <Image Include="res\textures\pathetic.png">
-      <Filter>资源文件</Filter>
-    </Image>
-    <Image Include="res\textures\calm.png">
-      <Filter>资源文件</Filter>
-    </Image>
-    <Image Include="res\textures\awesomeface.png">
-      <Filter>资源文件</Filter>
-    </Image>
-    <Image Include="res\textures\nerida.png">
-      <Filter>资源文件</Filter>
-    </Image>
-    <Image Include="res\icon\chris.png">
-      <Filter>资源文件</Filter>
-    </Image>
-    <Image Include="res\textures\dots.png">
-      <Filter>资源文件</Filter>
-    </Image>
-    <Image Include="res\textures\02asuka.png">
-      <Filter>资源文件</Filter>
-    </Image>
-    <Image Include="res\icon\OpenGL_logo.png">
-      <Filter>资源文件</Filter>
-    </Image>
-    <Image Include="res\textures\t.png">
-      <Filter>资源文件</Filter>
-    </Image>
-    <Image Include="res\textures\zzz.png">
-      <Filter>资源文件</Filter>
-    </Image>
-    <Image Include="res\textures\asuka.jpg">
-      <Filter>资源文件</Filter>
-    </Image>
-    <Image Include="res\icon\opengl.png">
-      <Filter>资源文件</Filter>
-    </Image>
+    <ClInclude Include="src\vendor\OBJ\OBJ_Loader.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Font Include="res\font\consola.ttf" />

@@ -32,6 +32,8 @@
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 // É«²Ê
 #define PURE_WHITE 1.0f, 1.0f, 1.0f
 #define PURE_BLACK NULL
@@ -39,5 +41,6 @@
 #define PRE_GREEN 0.0f, 1.0f, 0.0f
 #define PURE_BLUE 0.0f, 0.0f, 1.0f
 #define ARMY_GREEN 0.16f, 0.26f, 0.20f // ¾üÂÌ
+#define PERPLISH_BLUE 0.13f, 0.16f, 0.20f
 
 #endif // !PCH_H

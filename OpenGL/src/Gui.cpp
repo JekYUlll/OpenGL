@@ -1,35 +1,83 @@
 #include "Gui.h"
 
+bool Gui::_initialized = false;
+
 Gui& Gui::getInstance()
 {
-    IMGUI_CHECKVERSION();
-    static Gui instance;
-    ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO(); (void)io;
-    instance._io = io;
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;   // Enable Keyboard Controls
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;    // Enable Gamepad Controls
-
-    return instance;
+	static Gui instance;
+	return instance;
 }
 
-void Gui::SetFont(const std::string& fontPath, const float& fontScale)
+void Gui::Init(GLFWwindow* window, bool install_callbacks, const char* glsl_version)
 {
-    this->_fontScale = fontScale;
-    _io.Fonts->Clear(); // Clear previous fonts
-    static const ImWchar ranges[] = { 0x0020, 0x00FF, 0x4e00, 0x9FAF, 0 }; // Basic Latin + Chinese characters
-    ImFont* font = _io.Fonts->AddFontFromFileTTF(fontPath.c_str(), 8.0f * fontScale, NULL, ranges);
-    if (!font)
-        std::cerr << "Failed to load font!" << std::endl;
+	if (!_initialized) {
+		IMGUI_CHECKVERSION();
+		ImGui::CreateContext();
+		_io = &ImGui::GetIO();
+		ImGui_ImplGlfw_InitForOpenGL(window, install_callbacks);
+		ImGui_ImplOpenGL3_Init(glsl_version);
+		_initialized = true;
+	}
 }
 
-void Gui::SetFontGlobalScale(const float& fontScale)
+void Gui::SetFont(const std::string& fontPath, const float& scale)
 {
-    this->_io.FontGlobalScale = fontScale;
+	if (_io) {
+		ImFontConfig font_cfg;
+		font_cfg.SizePixels = scale * 13.0f;  // Example scale factor for font size
+		_io->Fonts->AddFontFromFileTTF(fontPath.c_str(), font_cfg.SizePixels, &font_cfg);
+		ImGui_ImplOpenGL3_CreateFontsTexture();
+	}
+	else {
+		std::cerr << "ImGuiIO is not initialized." << std::endl;
+	}
 }
 
-Gui::Gui()
-    :_fontScale(0.0f)
+void Gui::SetFontGlobalScale(const float& scale)
 {
-    this->_io = ImGui::GetIO(); (void)_io;
+	if (_io) {
+		_fontScale = scale;
+		_io->FontGlobalScale = _fontScale;
+	}
+	else {
+		std::cerr << "ImGuiIO is not initialized." << std::endl;
+	}
+}
+
+void Gui::StartDraw()
+{
+	glfwPollEvents();
+	// Start the Dear ImGui frame
+	ImGui_ImplOpenGL3_NewFrame();
+	ImGui_ImplGlfw_NewFrame();
+	ImGui::NewFrame();
+}
+
+void Gui::Render(GLFWwindow* window, ImVec4 clear_color)
+{
+	ImGui::Render();
+	int display_w, display_h;
+	glfwGetFramebufferSize(window, &display_w, &display_h);
+	glViewport(0, 0, display_w, display_h);
+	glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
+	glClear(GL_COLOR_BUFFER_BIT);
+	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+}
+
+void Gui::CleanUp()
+{
+	ImGui_ImplOpenGL3_Shutdown();
+	ImGui_ImplGlfw_Shutdown();
+	ImGui::DestroyContext();
+}
+
+ImGuiIO& Gui::GetIO()
+{
+	if (_io) {
+		return *_io;
+	}
+	else {
+		std::cerr << "ImGuiIO is not initialized." << std::endl;
+		throw std::runtime_error("ImGuiIO is not initialized.");
+	}
 }

@@ -2,6 +2,7 @@
 #define GUI_H
 
 #include <iostream>
+#include <thread>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <imgui/imgui.h>
@@ -10,33 +11,32 @@
 #include "Debug.h"
 #include "KeyControll.hpp"
 
-class Gui
-{
+class Gui {
 private:
-	ImGuiIO _io;
-	float _fontScale;
+    ImGuiIO* _io;
+    float _fontScale;
+    static bool _initialized;
 public:
-	static Gui& getInstance();
-	// inline void SetIo(const ImGuiIO& io) { this->_io = io; }
-	void SetFont(const std::string& fontPath, const float& scale);
-	inline void SetFontGlobalScale(const float& scale);
-	inline float GetFontGlobalScale() { return this->_fontScale; }
+    static Gui& getInstance(); 
+
+    void Init(GLFWwindow* window, bool install_callbacks, const char* glsl_version); 
+
+    void SetFont(const std::string& fontPath, const float& scale);
+
+    void SetFontGlobalScale(const float& scale); 
+
+    void StartDraw();
+    void Render(GLFWwindow* window, ImVec4 clear_color);
+
+    void CleanUp();
+
+    ImGuiIO& GetIO(); 
+
 private:
-	Gui();
-	Gui(const Gui&) = delete;
-	Gui& operator=(const Gui&) = delete;
-	
+    Gui() : _io(nullptr), _fontScale(1.0f) { _initialized = false; }
+    Gui(const Gui&) = delete;
+    Gui& operator=(const Gui&) = delete;
 };
-
-
-
-
-
-
-
-
-
-
 
 #endif // !GUI_H
 

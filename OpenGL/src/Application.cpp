@@ -1,19 +1,15 @@
 #include "pch.h"
 
-// 屏幕宽 高
 const GLuint WIDTH = 1920, HEIGHT = 1080;
+static float aspectRatio = static_cast<float>(WIDTH) / static_cast<float>(HEIGHT);
 // 缩放倍率
-const GLfloat SCALE = 1.0f;
+GLfloat SCALE = 1.0f;
 // ImGui 缩放
-float highDPIscaleFactor = 2.0f;
-
-static float f = 0.0f;
-static int counter = 0;
-
+float highDPIscaleFactor = 1.5f;
 const char* glsl_version = "#version 330";
 
 
-int main(void)
+int main(int argc, char const* argv[])
 {  
 #ifdef _DEBUG
     std::cout << "[Debug mode]" << std::endl;
@@ -22,6 +18,10 @@ int main(void)
 #endif
 
     auto window = init::Init("LearnOpenGL", WIDTH, HEIGHT, 3, 3, true);
+    if (!window) {
+        std::cerr << "Failed to init window!" << std::endl;
+        return -1;
+    }
     init::SetWindowIcon(window, "res/icon/opengl.png");
 
     {   // openGL自身问题：关闭窗口的时候，程序不会完全退出(check error返回一个error无限循环)。因此用作用域框起来(Cherno S13末尾)
@@ -48,30 +48,43 @@ int main(void)
         VertexBuffer vb(vertices, sizeof(vertices)); // VertexBuffer对象
 
         VertexBufferLayout layout;
-        // Cherno 是 2 我此处需要分别为位置和颜色调用Push
-        layout.Push<float>(3); // 前三个float是position
+        layout.Push<float>(3); // position
         layout.Push<float>(3); // color
-        layout.Push<float>(2); // 纹理坐标
+        layout.Push<float>(2); // texture coord
 
         va.AddBuffer(vb, layout);
-        // IndexBuffer对象
         IndexBuffer ib(indices, 6);
+        
+         // 初始
+         glm::mat4 projection = glm::ortho(-1.6f, 1.6f, -0.9f, 0.9f, -1.0f, 1.0f); // 正交矩阵
+         // projection = glm::perspective(45.0f, (GLfloat)WIDTH / (GLfloat)HEIGHT, 0.1f, 100.0f);
+         glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(SCALE, SCALE, SCALE)); // 缩放矩阵
+         glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0));
+         glm::mat4 model = scale;
+         float rotateAngel = 0.0f;
+         float rotateAxis[3] = {1.0f, 0.0f, 0.0f};
+         
+        
 
-        glm::mat4 proj = glm::ortho(-1.6f, 1.6f, -0.9f, 0.9f, -1.0f, 1.0f); // 正交矩阵
-        glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(SCALE, SCALE, 1.0f)); // 缩放矩阵
-        glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0));
-        glm::mat4 model = scale;
-        glm::mat4 mvp = proj * view * model;
+
+        //glm::mat4 model;
+        //glm::mat4 view;
+        //glm::mat4 projection;
+        //glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(SCALE, SCALE, SCALE)); // 缩放矩阵
+        //projection = glm::perspective(glm::radians(45.0f), aspectRatio, 0.1f, 100.0f);
+        //view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+        //model = glm::rotate(model, -55.0f, glm::vec3(1.0f, 0.0f, 0.0f));
 
         Shader shader("res/shaders/Basic.shader"); // 读取basic.shader
         shader.Bind();
 
-        shader.SetUniformMat4f("u_MVP", mvp);
+        shader.SetUniformMat4f("view", view);
+        shader.SetUniformMat4f("model", model);
+        shader.SetUniformMat4f("projection", projection);
 
         Texture texture1("res/textures/asuka.jpg");
         texture1.Bind(0);
         shader.SetUniform1i("ourTexture1", 0); // glUniform1i可以给纹理采样器分配一个位置值，能够在一个片段着色器中设置多个纹理。一个纹理的位置值通常称为一个纹理单元(Texture Unit)
-        
         Texture texture2("res/textures/calm.png");
         texture2.Bind(1);
         shader.SetUniform1i("ourTexture2", 1);
@@ -83,35 +96,16 @@ int main(void)
 
 #pragma region ImGuiInit
 
-        IMGUI_CHECKVERSION();
-        ImGui::CreateContext();
-        ImGuiIO& io = ImGui::GetIO(); (void)io;
-        io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
-        io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
-
-        io.Fonts->Clear(); // Clear previous fonts
-        static const ImWchar ranges[] = { 0x0020, 0x00FF, 0x4e00, 0x9FAF, 0 }; // Basic Latin + Chinese characters
-        ImFont* font = io.Fonts->AddFontFromFileTTF("res/font/consola.ttf", 8.0f * highDPIscaleFactor, NULL, ranges);
-        if (!font)
-        {
-            std::cerr << "Failed to load font!" << std::endl;
-            return -1;
-        }
-
-        
-        // 设置字体大小
-        io.FontGlobalScale = highDPIscaleFactor;
-       
-        // Setup Dear ImGui style
-        ImGui::StyleColorsDark();
-        // Setup Platform/Renderer backends
-        ImGui_ImplGlfw_InitForOpenGL(window, true);
-        ImGui_ImplOpenGL3_Init(glsl_version);
+        Gui& gui = Gui::getInstance();
+        Gui::getInstance().Init(window, true, glsl_version);
+        Gui::getInstance().SetFont("res/font/consola.ttf", highDPIscaleFactor);
+        Gui::getInstance().SetFontGlobalScale(highDPIscaleFactor);
+        ImGuiIO& io = Gui::getInstance().GetIO();
 
         bool show_demo_window = true;
         bool show_another_window = false;
         // ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
-        ImVec4 clear_color = ImVec4(ARMY_GREEN, 1.00f);
+        ImVec4 clear_color = ImVec4(PERPLISH_BLUE, 1.00f);
 
 #pragma endregion ImGuiInit
 
@@ -121,14 +115,13 @@ int main(void)
         /* Loop until the user closes the window */
         while (!glfwWindowShouldClose(window))
         {
+            
+            
             renderer.Clear();
-            glfwPollEvents();
 
 #pragma region ImGuiWhile
-            // Start the Dear ImGui frame
-            ImGui_ImplOpenGL3_NewFrame();
-            ImGui_ImplGlfw_NewFrame();
-            ImGui::NewFrame();
+
+            Gui::getInstance().StartDraw();
 
             // 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
             if (show_demo_window)
@@ -142,13 +135,17 @@ int main(void)
                 ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
                 ImGui::Checkbox("Another Window", &show_another_window);
 
-                ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
+                            // Edit 1 float using a slider from 0.0f to 1.0f
                 ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
 
-                if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
-                    counter++;
-                ImGui::SameLine();
-                ImGui::Text("counter = %d", counter);
+                ImGui::SliderFloat("SCALE", &SCALE, 0.0f, 100.0f);
+
+                ImGui::SliderFloat("rotateAngel", &rotateAngel, -180.0f, 180.0f);
+                ImGui::SliderFloat3("Rotate Axis", rotateAxis, -1.0f, 1.0f);
+
+                if (ImGui::Button("Print rotate"))
+                    std::cout << "rotateAngel: " << rotateAngel << "  rotateAxis: " << rotateAxis[0] << ", " << rotateAxis[1] << ", " << rotateAxis[2] << std::endl;
+                // ImGui::SameLine();
 
                 ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
                 ImGui::End();
@@ -162,14 +159,9 @@ int main(void)
                     show_another_window = false;
                 ImGui::End();
             }
-            // Rendering
-            ImGui::Render();
-            int display_w, display_h;
-            glfwGetFramebufferSize(window, &display_w, &display_h);
-            glViewport(0, 0, display_w, display_h);
-            glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
-            glClear(GL_COLOR_BUFFER_BIT);
-            ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+            
+            gui.Render(window, clear_color);
+
 #pragma endregion ImGuiWhile
 
             shader.Bind();
@@ -177,17 +169,22 @@ int main(void)
             texture1.Bind(0);
             texture2.Bind(1);
 
+            glm::mat4 model = glm::mat4(1.0f); // 如果删掉这一行，可以实现一直旋转的效果
+            model = glm::scale(model, glm::vec3(SCALE, SCALE, SCALE));
+            model = glm::rotate(model, rotateAngel, glm::vec3(rotateAxis[0], rotateAxis[1], rotateAxis[2]));
+            shader.SetUniformMat4f("model", model);
+           
             renderer.Draw(va, ib, shader);
+
+
             /* Swap front and back buffers */
             GLCall(glfwSwapBuffers(window));
             /* Poll for and process events */
             GLCall(glfwPollEvents());
         }
     }
-    // Cleanup
-    ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplGlfw_Shutdown();
-    ImGui::DestroyContext();
+    
+    Gui::getInstance().CleanUp();
 
     glfwDestroyWindow(window); 
     glfwTerminate();
