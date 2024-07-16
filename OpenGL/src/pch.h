@@ -10,12 +10,17 @@
 #include <sstream>
 #include <string>
 
+// #include <glad/glad.h>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
 #include <imgui/imgui.h>
 #include <imgui/imgui_impl_glfw.h>
 #include <imgui/imgui_impl_opengl3.h>
+
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 #include "Gui.h"
 
@@ -28,11 +33,8 @@
 #include "Shader.h"
 #include "Texture.h"
 //#include <boost/algorithm/algorithm.hpp>
+#include "Window.h"
 #include "KeyControll.hpp"
-
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
 
 // É«²Ê
 #define PURE_WHITE 1.0f, 1.0f, 1.0f

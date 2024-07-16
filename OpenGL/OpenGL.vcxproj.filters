@@ -69,9 +69,14 @@
     <ClCompile Include="src\Gui.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="src\Window.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\glad.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="res\shaders\Basic.shader" />
     <None Include="src\vendor\glm\detail\func_common.inl">
       <Filter>头文件</Filter>
     </None>
@@ -486,6 +491,8 @@
     <None Include="src\vendor\glm\gtx\wrap.inl">
       <Filter>头文件</Filter>
     </None>
+    <None Include="res\shaders\Basic.shader" />
+    <None Include="res\shaders\Mix.shader" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Renderer.h">
@@ -1421,11 +1428,14 @@
     <ClInclude Include="src\vendor\OBJ\OBJ_Loader.h">
       <Filter>头文件</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <Font Include="res\font\consola.ttf" />
-    <Font Include="res\font\consolab.ttf" />
-    <Font Include="res\font\consolai.ttf" />
-    <Font Include="res\font\consolaz.ttf" />
+    <ClInclude Include="src\Window.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\glad\glad.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\KHR\khrplatform.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -11,7 +11,8 @@ public:
 	// 单例模式
 	static Renderer& getInstance();
 
-	void Draw(const VertexArray& va, const IndexBuffer& ib, const Shader& shader) const;
+	void DrawElements(const VertexArray& va, const IndexBuffer& ib, const Shader& shader) const;
+	void DrawArrays(const VertexArray& va, const Shader& shader, GLenum mode, GLint first, GLsizei count) const;
 
 	void Clear();
 	// 设置背景颜色

@@ -1,13 +1,12 @@
 #include "pch.h"
 
-const GLuint WIDTH = 1920, HEIGHT = 1080;
-static float aspectRatio = static_cast<float>(WIDTH) / static_cast<float>(HEIGHT);
+const unsigned int WIDTH = 1920, HEIGHT = 1080;
+static float aspectRatio = static_cast<float>(WIDTH) / static_cast<float>(HEIGHT); // 屏幕比例
 // 缩放倍率
-GLfloat SCALE = 1.0f;
+float SCALE = 1.0f;
 // ImGui 缩放
 float highDPIscaleFactor = 1.5f;
 const char* glsl_version = "#version 330";
-
 
 int main(int argc, char const* argv[])
 {  
@@ -17,29 +16,107 @@ int main(int argc, char const* argv[])
     std::cout << "[Release 1.0]" << std::endl;
 #endif
 
-    auto window = init::Init("LearnOpenGL", WIDTH, HEIGHT, 3, 3, true);
+    auto window = init::Init("--- LearnOpenGL", WIDTH, HEIGHT, 3, 3, true);
     if (!window) {
         std::cerr << "Failed to init window!" << std::endl;
         return -1;
     }
+
     init::SetWindowIcon(window, "res/icon/opengl.png");
 
     {   // openGL自身问题：关闭窗口的时候，程序不会完全退出(check error返回一个error无限循环)。因此用作用域框起来(Cherno S13末尾)
         // 顶点位置的浮点数组(顶点不光包含位置，还有法线等信息)
 
+        glViewport(0, 0, WIDTH, HEIGHT); // 设置初始视口
+
+        Shader shader("res/shaders/Mix.shader"); // 读取basic.shader
+        // 设置用户指针为 Shader 对象
+        glfwSetWindowUserPointer(window, &shader);
+        glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
         // 顶点属性
-		GLfloat vertices[] = {
-            // ---- 位置 ----       ---- 颜色 ----     - 纹理坐标 -
-            0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // 右上
-            0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // 右下
-           -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // 左下
-           -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // 左上
-		};
-        // index buffer 索引缓冲区
-        GLuint indices[] = {
-            0, 1, 3, // 第一个三角形//
-            1, 2, 3  // 第二个三角形
+		//float vertices[] = {
+  //          // ---- 位置 ----       ---- 颜色 ----     - 纹理坐标 -
+  //          0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // 右上
+  //          0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // 右下
+  //         -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // 左下
+  //         -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // 左上
+		//};
+        float vertices[] = {
+            // ---- 位置 ----       ---- 颜色 ----       - 纹理坐标 -
+            // 前面
+            -0.5f, -0.5f,  0.5f,   1.0f, 0.0f, 0.0f,   0.0f, 0.0f,
+             0.5f, -0.5f,  0.5f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,
+             0.5f,  0.5f,  0.5f,   0.0f, 0.0f, 1.0f,   1.0f, 1.0f,
+             0.5f,  0.5f,  0.5f,   0.0f, 0.0f, 1.0f,   1.0f, 1.0f,
+            -0.5f,  0.5f,  0.5f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f,
+            -0.5f, -0.5f,  0.5f,   1.0f, 0.0f, 0.0f,   0.0f, 0.0f,
+            // 后面
+            -0.5f, -0.5f, -0.5f,   1.0f, 0.0f, 0.0f,   0.0f, 0.0f,
+            -0.5f,  0.5f, -0.5f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,
+             0.5f,  0.5f, -0.5f,   0.0f, 0.0f, 1.0f,   1.0f, 1.0f,
+             0.5f,  0.5f, -0.5f,   0.0f, 0.0f, 1.0f,   1.0f, 1.0f,
+             0.5f, -0.5f, -0.5f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f,
+            -0.5f, -0.5f, -0.5f,   1.0f, 0.0f, 0.0f,   0.0f, 0.0f,
+            // 左面
+            -0.5f,  0.5f,  0.5f,   1.0f, 0.0f, 0.0f,   1.0f, 0.0f,
+            -0.5f,  0.5f, -0.5f,   0.0f, 1.0f, 0.0f,   1.0f, 1.0f,
+            -0.5f, -0.5f, -0.5f,   0.0f, 0.0f, 1.0f,   0.0f, 1.0f,
+            -0.5f, -0.5f, -0.5f,   0.0f, 0.0f, 1.0f,   0.0f, 1.0f,
+            -0.5f, -0.5f,  0.5f,   1.0f, 1.0f, 0.0f,   0.0f, 0.0f,
+            -0.5f,  0.5f,  0.5f,   1.0f, 0.0f, 0.0f,   1.0f, 0.0f,
+            // 右面
+             0.5f,  0.5f,  0.5f,   1.0f, 0.0f, 0.0f,   1.0f, 0.0f,
+             0.5f, -0.5f, -0.5f,   0.0f, 1.0f, 0.0f,   0.0f, 1.0f,
+             0.5f,  0.5f, -0.5f,   0.0f, 0.0f, 1.0f,   1.0f, 1.0f,
+             0.5f, -0.5f, -0.5f,   0.0f, 1.0f, 0.0f,   0.0f, 1.0f,
+             0.5f,  0.5f,  0.5f,   1.0f, 0.0f, 0.0f,   1.0f, 0.0f,
+             0.5f, -0.5f,  0.5f,   1.0f, 1.0f, 0.0f,   0.0f, 0.0f,
+             // 顶面
+             -0.5f,  0.5f, -0.5f,   1.0f, 0.0f, 0.0f,   0.0f, 1.0f,
+             -0.5f,  0.5f,  0.5f,   0.0f, 1.0f, 0.0f,   0.0f, 0.0f,
+              0.5f,  0.5f,  0.5f,   0.0f, 0.0f, 1.0f,   1.0f, 0.0f,
+              0.5f,  0.5f,  0.5f,   0.0f, 0.0f, 1.0f,   1.0f, 0.0f,
+              0.5f,  0.5f, -0.5f,   1.0f, 1.0f, 0.0f,   1.0f, 1.0f,
+             -0.5f,  0.5f, -0.5f,   1.0f, 0.0f, 0.0f,   0.0f, 1.0f,
+             // 底面
+             -0.5f, -0.5f, -0.5f,   1.0f, 0.0f, 0.0f,   0.0f, 1.0f,
+              0.5f, -0.5f,  0.5f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,
+             -0.5f, -0.5f,  0.5f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,
+              0.5f, -0.5f,  0.5f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,
+             -0.5f, -0.5f, -0.5f,   1.0f, 0.0f, 0.0f,   0.0f, 1.0f,
+              0.5f, -0.5f, -0.5f,   1.0f, 1.0f, 0.0f,   1.0f, 1.0f
         };
+
+        // index buffer 索引缓冲区
+        unsigned int indices[] = {
+            // 前面
+            0, 1, 2, 2, 3, 0,
+            // 后面
+            4, 5, 6, 6, 7, 4,
+            // 左面
+            8, 9, 10, 10, 11, 8,
+            // 右面
+            12, 13, 14, 14, 15, 12,
+            // 上面
+            16, 17, 18, 18, 19, 16,
+            // 下面
+            20, 21, 22, 22, 23, 20
+        };
+
+		glm::vec3 cubePositions[] = {
+              glm::vec3(0.0f,  0.0f,  0.0f),
+              glm::vec3(2.0f,  5.0f, -15.0f),
+              glm::vec3(-1.5f, -2.2f, -2.5f),
+              glm::vec3(-3.8f, -2.0f, -12.3f),
+              glm::vec3(2.4f, -0.4f, -3.5f),
+              glm::vec3(-1.7f,  3.0f, -7.5f),
+              glm::vec3(1.3f, -2.0f, -2.5f),
+              glm::vec3(1.5f,  2.0f, -2.5f),
+              glm::vec3(1.5f,  0.2f, -1.5f),
+              glm::vec3(-1.3f,  1.0f, -1.5f)
+		};
+
+        GLCall(glEnable(GL_DEPTH_TEST)); // 启用深度测试
 
         GLCall(glEnable(GL_BLEND)); // 启用混合
         GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
@@ -54,28 +131,16 @@ int main(int argc, char const* argv[])
 
         va.AddBuffer(vb, layout);
         IndexBuffer ib(indices, 6);
+
+        // glm::mat4 projection = glm::ortho(-1.6f, 1.6f, -0.9f, 0.9f, -1.0f, 1.0f); // 正交矩阵
+        glm::mat4 projection = glm::perspective(glm::radians(45.0f), aspectRatio, 0.01f, 100.0f);
+        glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(SCALE, SCALE, SCALE)); // 缩放矩阵
+        glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, -3.0f));
+        glm::mat4 model = scale;
+
+        float rotateAngel = 0.0f;
+        float rotateAxis[3] = {0.0f, 1.0f, 0.0f};
         
-         // 初始
-         glm::mat4 projection = glm::ortho(-1.6f, 1.6f, -0.9f, 0.9f, -1.0f, 1.0f); // 正交矩阵
-         // projection = glm::perspective(45.0f, (GLfloat)WIDTH / (GLfloat)HEIGHT, 0.1f, 100.0f);
-         glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(SCALE, SCALE, SCALE)); // 缩放矩阵
-         glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0));
-         glm::mat4 model = scale;
-         float rotateAngel = 0.0f;
-         float rotateAxis[3] = {1.0f, 0.0f, 0.0f};
-         
-        
-
-
-        //glm::mat4 model;
-        //glm::mat4 view;
-        //glm::mat4 projection;
-        //glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(SCALE, SCALE, SCALE)); // 缩放矩阵
-        //projection = glm::perspective(glm::radians(45.0f), aspectRatio, 0.1f, 100.0f);
-        //view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
-        //model = glm::rotate(model, -55.0f, glm::vec3(1.0f, 0.0f, 0.0f));
-
-        Shader shader("res/shaders/Basic.shader"); // 读取basic.shader
         shader.Bind();
 
         shader.SetUniformMat4f("view", view);
@@ -102,31 +167,27 @@ int main(int argc, char const* argv[])
         Gui::getInstance().SetFontGlobalScale(highDPIscaleFactor);
         ImGuiIO& io = Gui::getInstance().GetIO();
 
-        bool show_demo_window = true;
+        bool show_demo_window = false;
         bool show_another_window = false;
         // ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
-        ImVec4 clear_color = ImVec4(PERPLISH_BLUE, 1.00f);
+        ImVec4 clear_color = ImVec4(ARMY_GREEN, 1.00f);
 
 #pragma endregion ImGuiInit
 
         Renderer& renderer = Renderer::getInstance();
-
         // renderer.SetBgColor(ARMY_GREEN);
-        /* Loop until the user closes the window */
         while (!glfwWindowShouldClose(window))
         {
-            
-            
             renderer.Clear();
+            glClear(GL_DEPTH_BUFFER_BIT);
 
-#pragma region ImGuiWhile
+#pragma region ImGuiLoop
 
             Gui::getInstance().StartDraw();
 
             // 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
             if (show_demo_window)
                 ImGui::ShowDemoWindow(&show_demo_window);
-
             // 2. Show a simple window that we create ourselves. We use a Begin/End pair to create a named window.
             {
                 ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
@@ -135,17 +196,19 @@ int main(int argc, char const* argv[])
                 ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
                 ImGui::Checkbox("Another Window", &show_another_window);
 
-                            // Edit 1 float using a slider from 0.0f to 1.0f
+                // Edit 1 float using a slider from 0.0f to 1.0f
                 ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
 
-                ImGui::SliderFloat("SCALE", &SCALE, 0.0f, 100.0f);
+                ImGui::SliderFloat("SCALE", &SCALE, 0.1f, 10.0f);
 
                 ImGui::SliderFloat("rotateAngel", &rotateAngel, -180.0f, 180.0f);
                 ImGui::SliderFloat3("Rotate Axis", rotateAxis, -1.0f, 1.0f);
 
                 if (ImGui::Button("Print rotate"))
                     std::cout << "rotateAngel: " << rotateAngel << "  rotateAxis: " << rotateAxis[0] << ", " << rotateAxis[1] << ", " << rotateAxis[2] << std::endl;
-                // ImGui::SameLine();
+                ImGui::SameLine();
+                if (ImGui::Button("Reset"))
+                    rotateAngel = 0.0f;
 
                 ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
                 ImGui::End();
@@ -159,33 +222,45 @@ int main(int argc, char const* argv[])
                     show_another_window = false;
                 ImGui::End();
             }
-            
+
             gui.Render(window, clear_color);
 
-#pragma endregion ImGuiWhile
+#pragma endregion ImGuiLoop
 
             shader.Bind();
 
             texture1.Bind(0);
             texture2.Bind(1);
 
-            glm::mat4 model = glm::mat4(1.0f); // 如果删掉这一行，可以实现一直旋转的效果
-            model = glm::scale(model, glm::vec3(SCALE, SCALE, SCALE));
-            model = glm::rotate(model, rotateAngel, glm::vec3(rotateAxis[0], rotateAxis[1], rotateAxis[2]));
-            shader.SetUniformMat4f("model", model);
+            // glm::mat4 model = glm::mat4(1.0f); // 如果删掉这一行，可以实现一直旋转的效果
+            // model = glm::scale(model, glm::vec3(SCALE, SCALE, SCALE));
+            // model = glm::rotate(model, rotateAngel, glm::vec3(rotateAxis[0], rotateAxis[1], rotateAxis[2]));
+            // model = glm::rotate(model, (GLfloat)glfwGetTime() * 1.2f, glm::vec3(0.5f, 1.0f, 0.0f));
+
+            shader.SetUniformMat4f("view", view);
+            // shader.SetUniformMat4f("model", model);
+            shader.SetUniformMat4f("projection", projection);
            
-            renderer.Draw(va, ib, shader);
+            // renderer.DrawElements(va, ib, shader);
+            // renderer.DrawArrays(va, shader, GL_TRIANGLES, 0, 36);
+            for (size_t i = 0; i < 10; i++)
+            {
+                glm::mat4 model = glm::mat4(1.0f);
+                model = glm::translate(model, cubePositions[i]);
+                float angle = glm::radians(20.0f * i);
+                model = glm::rotate(model, (float)glfwGetTime() * angle, glm::vec3(1.0f, 0.3f, 0.5f));
+                shader.SetUniformMat4f("model", model);
 
+                renderer.DrawArrays(va, shader, GL_TRIANGLES, 0, 36);
+            }
+            
+            GLCall(glfwSwapBuffers(window)); /* Swap front and back buffers */
+            GLCall(glfwPollEvents()); /* Poll for and process events */
 
-            /* Swap front and back buffers */
-            GLCall(glfwSwapBuffers(window));
-            /* Poll for and process events */
-            GLCall(glfwPollEvents());
         }
     }
-    
-    Gui::getInstance().CleanUp();
 
+    Gui::getInstance().CleanUp();
     glfwDestroyWindow(window); 
     glfwTerminate();
     return 0;
