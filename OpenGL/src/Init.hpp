@@ -66,7 +66,7 @@ namespace init {
         /* Make the window's context current */
         glfwMakeContextCurrent(window);
         // 设置按键回调
-        glfwSetKeyCallback(window, kcb::KeyCallBack);
+        glfwSetKeyCallback(window, kcb::key_callback);
         // 设置垂直同步，帧数限定在60
         glfwSwapInterval(1);
         // 初始化 GLEW

@@ -1,11 +1,10 @@
 #include "pch.h"
 
-const unsigned int WIDTH = 1920, HEIGHT = 1080;
-static float aspectRatio = static_cast<float>(WIDTH) / static_cast<float>(HEIGHT); // 屏幕比例
-// 缩放倍率
-float SCALE = 1.0f;
-// ImGui 缩放
-float highDPIscaleFactor = 1.5f;
+const unsigned int WIDTH = 1792, HEIGHT = 934;
+float aspectRatio = static_cast<float>(WIDTH) / static_cast<float>(HEIGHT); // 屏幕比例
+float image_scale = 1.0f; // 图像缩放倍率
+float ui_scale = 1.4f; // ImGui 缩放
+
 const char* glsl_version = "#version 330";
 
 int main(int argc, char const* argv[])
@@ -16,6 +15,9 @@ int main(int argc, char const* argv[])
     std::cout << "[Release 1.0]" << std::endl;
 #endif
 
+    cameraSpeed = 0.05f;
+
+
     auto window = init::Init("--- LearnOpenGL", WIDTH, HEIGHT, 3, 3, true);
     if (!window) {
         std::cerr << "Failed to init window!" << std::endl;
@@ -24,8 +26,10 @@ int main(int argc, char const* argv[])
 
     init::SetWindowIcon(window, "res/icon/opengl.png");
 
+    // 设置边框颜色为黑色
+    // SetWindowBorderColor(window, RGB(0, 0, 0));
+
     {   // openGL自身问题：关闭窗口的时候，程序不会完全退出(check error返回一个error无限循环)。因此用作用域框起来(Cherno S13末尾)
-        // 顶点位置的浮点数组(顶点不光包含位置，还有法线等信息)
 
         glViewport(0, 0, WIDTH, HEIGHT); // 设置初始视口
 
@@ -71,20 +75,20 @@ int main(int argc, char const* argv[])
              0.5f, -0.5f, -0.5f,   0.0f, 1.0f, 0.0f,   0.0f, 1.0f,
              0.5f,  0.5f,  0.5f,   1.0f, 0.0f, 0.0f,   1.0f, 0.0f,
              0.5f, -0.5f,  0.5f,   1.0f, 1.0f, 0.0f,   0.0f, 0.0f,
-             // 顶面
-             -0.5f,  0.5f, -0.5f,   1.0f, 0.0f, 0.0f,   0.0f, 1.0f,
-             -0.5f,  0.5f,  0.5f,   0.0f, 1.0f, 0.0f,   0.0f, 0.0f,
-              0.5f,  0.5f,  0.5f,   0.0f, 0.0f, 1.0f,   1.0f, 0.0f,
-              0.5f,  0.5f,  0.5f,   0.0f, 0.0f, 1.0f,   1.0f, 0.0f,
-              0.5f,  0.5f, -0.5f,   1.0f, 1.0f, 0.0f,   1.0f, 1.0f,
-             -0.5f,  0.5f, -0.5f,   1.0f, 0.0f, 0.0f,   0.0f, 1.0f,
-             // 底面
-             -0.5f, -0.5f, -0.5f,   1.0f, 0.0f, 0.0f,   0.0f, 1.0f,
-              0.5f, -0.5f,  0.5f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,
-             -0.5f, -0.5f,  0.5f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,
-              0.5f, -0.5f,  0.5f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,
-             -0.5f, -0.5f, -0.5f,   1.0f, 0.0f, 0.0f,   0.0f, 1.0f,
-              0.5f, -0.5f, -0.5f,   1.0f, 1.0f, 0.0f,   1.0f, 1.0f
+            // 顶面
+            -0.5f,  0.5f, -0.5f,   1.0f, 0.0f, 0.0f,   0.0f, 1.0f,
+            -0.5f,  0.5f,  0.5f,   0.0f, 1.0f, 0.0f,   0.0f, 0.0f,
+             0.5f,  0.5f,  0.5f,   0.0f, 0.0f, 1.0f,   1.0f, 0.0f,
+             0.5f,  0.5f,  0.5f,   0.0f, 0.0f, 1.0f,   1.0f, 0.0f,
+             0.5f,  0.5f, -0.5f,   1.0f, 1.0f, 0.0f,   1.0f, 1.0f,
+            -0.5f,  0.5f, -0.5f,   1.0f, 0.0f, 0.0f,   0.0f, 1.0f,
+            // 底面
+            -0.5f, -0.5f, -0.5f,   1.0f, 0.0f, 0.0f,   0.0f, 1.0f,
+             0.5f, -0.5f,  0.5f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,
+            -0.5f, -0.5f,  0.5f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,
+             0.5f, -0.5f,  0.5f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,
+            -0.5f, -0.5f, -0.5f,   1.0f, 0.0f, 0.0f,   0.0f, 1.0f,
+             0.5f, -0.5f, -0.5f,   1.0f, 1.0f, 0.0f,   1.0f, 1.0f
         };
 
         // index buffer 索引缓冲区
@@ -134,12 +138,23 @@ int main(int argc, char const* argv[])
 
         // glm::mat4 projection = glm::ortho(-1.6f, 1.6f, -0.9f, 0.9f, -1.0f, 1.0f); // 正交矩阵
         glm::mat4 projection = glm::perspective(glm::radians(45.0f), aspectRatio, 0.01f, 100.0f);
-        glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(SCALE, SCALE, SCALE)); // 缩放矩阵
-        glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, -3.0f));
+        glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(image_scale, image_scale, image_scale)); // 缩放矩阵
+        // glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, -3.0f));
+        glm::mat4 view;
+        view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+
         glm::mat4 model = scale;
 
         float rotateAngel = 0.0f;
-        float rotateAxis[3] = {0.0f, 1.0f, 0.0f};
+        float rotateSpeed = 1.0f;
+        float rotateAxis[3] = {1.0f, 0.5f, 0.5f};
+
+        /*glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+        glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
+        glm::vec3 cameraDirection = glm::normalize(cameraPos - cameraTarget);
+        glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
+        glm::vec3 cameraRight = glm::normalize(glm::cross(up, cameraDirection));
+        glm::vec3 cameraUp = glm::cross(cameraDirection, cameraRight);*/
         
         shader.Bind();
 
@@ -163,67 +178,56 @@ int main(int argc, char const* argv[])
 
         Gui& gui = Gui::getInstance();
         Gui::getInstance().Init(window, true, glsl_version);
-        Gui::getInstance().SetFont("res/font/consola.ttf", highDPIscaleFactor);
-        Gui::getInstance().SetFontGlobalScale(highDPIscaleFactor);
+        Gui::getInstance().SetFont("res/font/consola.ttf", ui_scale);
+        Gui::getInstance().SetFontGlobalScale(ui_scale);
         ImGuiIO& io = Gui::getInstance().GetIO();
 
         bool show_demo_window = false;
-        bool show_another_window = false;
-        // ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
-        ImVec4 clear_color = ImVec4(ARMY_GREEN, 1.00f);
+        ImVec4 clear_color = ImVec4(IMGUI_SKY_BLUE, 1.00f);
 
 #pragma endregion ImGuiInit
 
         Renderer& renderer = Renderer::getInstance();
-        // renderer.SetBgColor(ARMY_GREEN);
+        
         while (!glfwWindowShouldClose(window))
         {
             renderer.Clear();
-            glClear(GL_DEPTH_BUFFER_BIT);
+            renderer.SetBgColor(clear_color);
 
 #pragma region ImGuiLoop
 
             Gui::getInstance().StartDraw();
-
             // 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
             if (show_demo_window)
                 ImGui::ShowDemoWindow(&show_demo_window);
             // 2. Show a simple window that we create ourselves. We use a Begin/End pair to create a named window.
             {
-                ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
-
-                ImGui::Text("This is a text.");               // Display some text (you can use a format strings too)
+                ImGui::Begin("Transform");                          // Create a window called "Hello, world!" and append into it.
                 ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
-                ImGui::Checkbox("Another Window", &show_another_window);
-
                 // Edit 1 float using a slider from 0.0f to 1.0f
                 ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
 
-                ImGui::SliderFloat("SCALE", &SCALE, 0.1f, 10.0f);
+                ImGui::SliderFloat("Scale", &image_scale, 0.02f, 2.75f);
 
-                ImGui::SliderFloat("rotateAngel", &rotateAngel, -180.0f, 180.0f);
+                ImGui::SliderFloat("Rotate Angel", &rotateAngel, -180.0f, 180.0f);
+                ImGui::SliderFloat("Rotate Speed", &rotateSpeed, 0.01f, 10.0f);
                 ImGui::SliderFloat3("Rotate Axis", rotateAxis, -1.0f, 1.0f);
 
-                if (ImGui::Button("Print rotate"))
+                if (ImGui::Button("Print"))
                     std::cout << "rotateAngel: " << rotateAngel << "  rotateAxis: " << rotateAxis[0] << ", " << rotateAxis[1] << ", " << rotateAxis[2] << std::endl;
                 ImGui::SameLine();
-                if (ImGui::Button("Reset"))
+                if (ImGui::Button("Reset")) {
+                    image_scale = 1.0f;
                     rotateAngel = 0.0f;
+                    rotateSpeed = 1.0f;
+                    rotateAxis[0] = 1.0f;
+                    rotateAxis[1] = 0.5f;
+                    rotateAxis[2] = 0.5f;
+                }
 
                 ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
                 ImGui::End();
             }
-            // 3. Show another simple window.
-            if (show_another_window)
-            {
-                ImGui::Begin("Another Window", &show_another_window);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
-                ImGui::Text("Hello from another window!");
-                if (ImGui::Button("Close Me"))
-                    show_another_window = false;
-                ImGui::End();
-            }
-
-            gui.Render(window, clear_color);
 
 #pragma endregion ImGuiLoop
 
@@ -232,18 +236,29 @@ int main(int argc, char const* argv[])
             texture1.Bind(0);
             texture2.Bind(1);
 
-            // glm::mat4 model = glm::mat4(1.0f); // 如果删掉这一行，可以实现一直旋转的效果
-            // model = glm::scale(model, glm::vec3(SCALE, SCALE, SCALE));
-            // model = glm::rotate(model, rotateAngel, glm::vec3(rotateAxis[0], rotateAxis[1], rotateAxis[2]));
-            // model = glm::rotate(model, (GLfloat)glfwGetTime() * 1.2f, glm::vec3(0.5f, 1.0f, 0.0f));
+            // rotateSpeed = (float)abs(sin(glfwGetTime())) * 5.0f;
+
+            // 圆
+            /*GLfloat radius = 10.0f;
+            GLfloat camX = sin(glfwGetTime()) * radius;
+            GLfloat camZ = cos(glfwGetTime()) * radius;*/
+
+            glm::mat4 model = glm::mat4(1.0f);
+            model = glm::scale(model, glm::vec3(image_scale, image_scale, image_scale));
+            model = glm::rotate(model, rotateAngel, glm::vec3(rotateAxis[0], rotateAxis[1], rotateAxis[2]));
+            model = glm::rotate(model, (GLfloat)glfwGetTime() * rotateSpeed, glm::vec3(rotateAxis[0], rotateAxis[1], rotateAxis[2]));
+            view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
 
             shader.SetUniformMat4f("view", view);
-            // shader.SetUniformMat4f("model", model);
+            shader.SetUniformMat4f("model", model);
             shader.SetUniformMat4f("projection", projection);
            
             // renderer.DrawElements(va, ib, shader);
-            // renderer.DrawArrays(va, shader, GL_TRIANGLES, 0, 36);
-            for (size_t i = 0; i < 10; i++)
+            renderer.DrawArrays(va, shader, GL_TRIANGLES, 0, 36);
+
+            gui.Render(window);
+
+            /*for (size_t i = 0; i < 10; i++)
             {
                 glm::mat4 model = glm::mat4(1.0f);
                 model = glm::translate(model, cubePositions[i]);
@@ -252,11 +267,9 @@ int main(int argc, char const* argv[])
                 shader.SetUniformMat4f("model", model);
 
                 renderer.DrawArrays(va, shader, GL_TRIANGLES, 0, 36);
-            }
-            
+            }*/
             GLCall(glfwSwapBuffers(window)); /* Swap front and back buffers */
             GLCall(glfwPollEvents()); /* Poll for and process events */
-
         }
     }
 

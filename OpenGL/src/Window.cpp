@@ -12,16 +12,26 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
     shader->SetUniformMat4f("projection", projection);
 }
 
-void AdaptToWindow(int& width, int& height, int winW, int WinH)
+void AdaptToWindow(int& width, int& height, int winW, int winH)
 {
 	double  wRatio = winW * 1.0f / width;
-	double  hRatio = WinH * 1.0f / height;
+	double  hRatio = winH * 1.0f / height;
 	if (wRatio < hRatio) {
 		width = winW;
 		height = (int)(wRatio * height);
 	}
 	else {
-		height = WinH;
+		height = winH;
 		width = (int)(hRatio * width);
 	}
+}
+
+void SetWindowBorderColor(GLFWwindow* window, COLORREF color)
+{
+    HWND hwnd = glfwGetWin32Window(window);
+    if (hwnd)
+    {
+        BOOL enable = TRUE; // 设置窗口的属性
+        DwmSetWindowAttribute(hwnd, DWMWA_BORDER_COLOR, &color, sizeof(color));
+    }
 }

@@ -4,6 +4,7 @@
 #include "VertexArray.h"
 #include "IndexBuffer.h"
 #include "Shader.h"
+#include <imgui/imgui.h>
 
 class Renderer
 {
@@ -21,6 +22,7 @@ public:
 	void SetBgColor(float r, float g, float b, float a);
 	// 设置背景颜色(默认为黑)
 	void SetBgColor();
+	void SetBgColor(ImVec4 clear_color);
 private:
 	Renderer() {}  // 私有构造函数
 	Renderer(const Renderer&) = delete; // 禁止拷贝构造

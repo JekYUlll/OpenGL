@@ -32,17 +32,19 @@
 #include "IndexBuffer.h"
 #include "Shader.h"
 #include "Texture.h"
+#include "Camera.h"
 //#include <boost/algorithm/algorithm.hpp>
 #include "Window.h"
 #include "KeyControll.hpp"
 
 // 色彩
 #define PURE_WHITE 1.0f, 1.0f, 1.0f
-#define PURE_BLACK NULL
+#define PURE_BLACK 0.0f, 0.0f, 0.0f
 #define PURE_RED 1.0f, 0.0f, 0.0f
 #define PRE_GREEN 0.0f, 1.0f, 0.0f
 #define PURE_BLUE 0.0f, 0.0f, 1.0f
 #define ARMY_GREEN 0.16f, 0.26f, 0.20f // 军绿
-#define PERPLISH_BLUE 0.13f, 0.16f, 0.20f
+#define PERPLISH_BLUE 0.13f, 0.16f, 0.20f // 藏蓝
+#define IMGUI_SKY_BLUE 0.45f, 0.55f, 0.60f // ImGui初始蓝绿色
 
 #endif // !PCH_H

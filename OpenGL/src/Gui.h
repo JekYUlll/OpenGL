@@ -26,7 +26,7 @@ public:
     void SetFontGlobalScale(const float& scale); 
 
     void StartDraw();
-    void Render(GLFWwindow* window, ImVec4 clear_color);
+    void Render(GLFWwindow* window);
 
     void CleanUp();
 

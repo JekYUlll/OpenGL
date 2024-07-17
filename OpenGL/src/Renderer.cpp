@@ -24,6 +24,7 @@ void Renderer::DrawArrays(const VertexArray& va, const Shader& shader, GLenum mo
 void Renderer::Clear()
 {
 	GLCall(glClear(GL_COLOR_BUFFER_BIT));
+	GLCall(glClear(GL_DEPTH_BUFFER_BIT));
 }
 
 void Renderer::SetBgColor(float r, float g, float b, float a = 1.0f)
@@ -39,4 +40,9 @@ void Renderer::SetBgColor(float r, float g, float b)
 void Renderer::SetBgColor()
 {
 	GLCall(glClearColor(0.0f, 0.0f, 0.0f, 1.0f));
+}
+
+void Renderer::SetBgColor(ImVec4 clear_color)
+{
+	GLCall(glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w));
 }
