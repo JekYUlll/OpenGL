@@ -1,6 +1,6 @@
 #include "Camera.h"
 
-float cameraSpeed = 0.05f;
+float cameraMove = 0.05f;
 glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
 glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
 glm::vec3 cameraDirection = glm::normalize(cameraPos - cameraTarget);

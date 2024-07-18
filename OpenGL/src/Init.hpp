@@ -27,6 +27,11 @@ namespace init {
 
     // 打印初始信息
     void PrintInitInfo(const unsigned int& width, const unsigned int& height) {
+#ifdef _DEBUG
+        std::cout << "[Debug mode]" << std::endl;
+#else
+        std::cout << "[Release 1.0]" << std::endl;
+#endif
         // 打印版本号
         std::cout << "OpenGL version: " << glGetString(GL_VERSION) << std::endl;
         // 打印分辨率

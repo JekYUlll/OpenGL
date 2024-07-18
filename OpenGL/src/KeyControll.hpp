@@ -8,10 +8,12 @@
 namespace kcb
 {
 	static bool isWireframe = false; // 是否为线框模式
+	static bool keys[1024];
 
 	inline void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode) // from LearnOpenGL 教程中函数名是key_callback
 	{
 		if (action == GLFW_PRESS) {
+			keys[key] = true;
 			// 1. 退出窗口
 			if (key == GLFW_KEY_ESCAPE) {
 				// 按下ESC键,设置window窗口的WindowShouldClose属性为true
@@ -30,15 +32,22 @@ namespace kcb
 					std::cout << "[press P] FILL mode" << std::endl;
 				}
 			}
-			if (key == GLFW_KEY_W)
-				cameraPos += cameraSpeed * cameraFront;
-			if (key == GLFW_KEY_S)
-				cameraPos -= cameraSpeed * cameraFront;
-			if (key == GLFW_KEY_A)
-				cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
-			if (key == GLFW_KEY_D)
-				cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
 		}
+		else if (action == GLFW_RELEASE) {
+			keys[key] = false;
+		}
+	}
+
+	inline void MoveCamera()
+	{
+		if (kcb::keys[GLFW_KEY_W])
+			cameraPos += cameraMove * cameraFront;
+		if (kcb::keys[GLFW_KEY_S])
+			cameraPos -= cameraMove * cameraFront;
+		if (kcb::keys[GLFW_KEY_A])
+			cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraMove;
+		if (kcb::keys[GLFW_KEY_D])
+			cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraMove;
 	}
 }
 

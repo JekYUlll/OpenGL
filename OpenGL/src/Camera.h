@@ -6,7 +6,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 
-extern float cameraSpeed;
+extern float cameraMove;
 extern glm::vec3 cameraPos;
 extern glm::vec3 cameraTarget;
 extern glm::vec3 cameraDirection;
@@ -14,11 +14,6 @@ extern glm::vec3 cameraFront;
 extern glm::vec3 up;
 extern glm::vec3 cameraRight;
 extern glm::vec3 cameraUp;
-
-
-
-
-
 
 class Camera
 {

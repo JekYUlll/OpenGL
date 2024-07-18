@@ -5,18 +5,16 @@ float aspectRatio = static_cast<float>(WIDTH) / static_cast<float>(HEIGHT); // Æ
 float image_scale = 1.0f; // Í¼ÏñËõ·Å±¶ÂÊ
 float ui_scale = 1.4f; // ImGui Ëõ·Å
 
+static GLfloat deltaTime = 0.0f;   // µ±Ç°Ö¡ÓöÉÏÒ»Ö¡µÄÊ±¼ä²î
+static GLfloat lastFrame = 0.0f;   // ÉÏÒ»Ö¡µÄÊ±¼ä
+
 const char* glsl_version = "#version 330";
 
 int main(int argc, char const* argv[])
 {  
-#ifdef _DEBUG
-    std::cout << "[Debug mode]" << std::endl;
-#else
-    std::cout << "[Release 1.0]" << std::endl;
-#endif
 
-    cameraSpeed = 0.05f;
-
+    float cameraSpeed = 3.0f;
+    
 
     auto window = init::Init("--- LearnOpenGL", WIDTH, HEIGHT, 3, 3, true);
     if (!window) {
@@ -37,14 +35,7 @@ int main(int argc, char const* argv[])
         // ÉèÖÃÓÃ»§Ö¸ÕëÎª Shader ¶ÔÏó
         glfwSetWindowUserPointer(window, &shader);
         glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-        // ¶¥µãÊôĞÔ
-		//float vertices[] = {
-  //          // ---- Î»ÖÃ ----       ---- ÑÕÉ« ----     - ÎÆÀí×ø±ê -
-  //          0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // ÓÒÉÏ
-  //          0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // ÓÒÏÂ
-  //         -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // ×óÏÂ
-  //         -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // ×óÉÏ
-		//};
+        
         float vertices[] = {
             // ---- Î»ÖÃ ----       ---- ÑÕÉ« ----       - ÎÆÀí×ø±ê -
             // Ç°Ãæ
@@ -194,6 +185,11 @@ int main(int argc, char const* argv[])
             renderer.Clear();
             renderer.SetBgColor(clear_color);
 
+            GLfloat currentFrame = glfwGetTime();
+            deltaTime = currentFrame - lastFrame;
+            lastFrame = currentFrame;
+            cameraMove = cameraSpeed * deltaTime;
+
 #pragma region ImGuiLoop
 
             Gui::getInstance().StartDraw();
@@ -213,6 +209,9 @@ int main(int argc, char const* argv[])
                 ImGui::SliderFloat("Rotate Speed", &rotateSpeed, 0.01f, 10.0f);
                 ImGui::SliderFloat3("Rotate Axis", rotateAxis, -1.0f, 1.0f);
 
+                ImGui::Text("Camera");
+                ImGui::SliderFloat("Camera Speed", &cameraSpeed, 0.0f, 10.0f);
+
                 if (ImGui::Button("Print"))
                     std::cout << "rotateAngel: " << rotateAngel << "  rotateAxis: " << rotateAxis[0] << ", " << rotateAxis[1] << ", " << rotateAxis[2] << std::endl;
                 ImGui::SameLine();
@@ -223,6 +222,8 @@ int main(int argc, char const* argv[])
                     rotateAxis[0] = 1.0f;
                     rotateAxis[1] = 0.5f;
                     rotateAxis[2] = 0.5f;
+                    cameraSpeed = 3.0f;
+                    cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
                 }
 
                 ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
@@ -237,7 +238,6 @@ int main(int argc, char const* argv[])
             texture2.Bind(1);
 
             // rotateSpeed = (float)abs(sin(glfwGetTime())) * 5.0f;
-
             // Ô²
             /*GLfloat radius = 10.0f;
             GLfloat camX = sin(glfwGetTime()) * radius;
@@ -258,6 +258,7 @@ int main(int argc, char const* argv[])
 
             gui.Render(window);
 
+            kcb::MoveCamera();
             /*for (size_t i = 0; i < 10; i++)
             {
                 glm::mat4 model = glm::mat4(1.0f);
