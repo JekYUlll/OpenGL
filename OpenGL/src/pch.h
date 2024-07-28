@@ -1,10 +1,6 @@
 #ifndef PCH_H
 #define PCH_H
 
-#ifndef GLEW_STATIC
-#define GLEW_STATIC
-#endif // !GLEW_STATIC
-
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -22,29 +18,31 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "Gui.h"
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
 
+#include "config.h"
+#include "Gui.h"
 #include "Debug.h"
 #include "Init.hpp"
+#include "VertexData.h"
 #include "Renderer.h"
 #include "VertexBuffer.h"
 #include "VertexArray.h"
+#include "VertexBufferLayout.h"
 #include "IndexBuffer.h"
 #include "Shader.h"
 #include "Texture.h"
+#include "Mesh.h"
+#include "Model.h"
 #include "Camera.h"
 //#include <boost/algorithm/algorithm.hpp>
 #include "Window.h"
-#include "KeyControll.hpp"
+#include "Controll.h"
+#include "Timer.h"
+#include "Color.h"
+#include "Math.h"
 
-// É«²Ê
-#define PURE_WHITE 1.0f, 1.0f, 1.0f
-#define PURE_BLACK 0.0f, 0.0f, 0.0f
-#define PURE_RED 1.0f, 0.0f, 0.0f
-#define PRE_GREEN 0.0f, 1.0f, 0.0f
-#define PURE_BLUE 0.0f, 0.0f, 1.0f
-#define ARMY_GREEN 0.16f, 0.26f, 0.20f // ¾üÂÌ
-#define PERPLISH_BLUE 0.13f, 0.16f, 0.20f // ²ØÀ¶
-#define IMGUI_SKY_BLUE 0.45f, 0.55f, 0.60f // ImGui³õÊ¼À¶ÂÌÉ«
 
 #endif // !PCH_H

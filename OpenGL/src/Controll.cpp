@@ -1,5 +1,4 @@
 #include "Controll.h"
-
 	
 namespace ctrl
 {
@@ -7,7 +6,7 @@ namespace ctrl
 	bool isWireframe = false;
 	static bool canShowCursor = true; // 是否显示光标
 	static bool keys[1024] = { false }; // 记录按键是否按下
-	static float lastX = (float)(WIDTH / 2), lastY = (float)(HEIGHT / 2); // 鼠标初始位置
+	static float lastX = (float)(1920 / 2), lastY = (float)(1080 / 2); // 鼠标初始位置
 	static bool firstMouse = true; // 是否是第一次按下鼠标
 
 	void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode) // from LearnOpenGL 教程中函数名是key_callback

@@ -8,8 +8,8 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
     glm::mat4 projection = glm::perspective(glm::radians(45.0f), aspectRatio, 0.1f, 100.0f);
 
     Shader* shader = static_cast<Shader*>(glfwGetWindowUserPointer(window));
-    shader->Bind();
-    shader->SetUniformMat4f("projection", projection);
+    shader->Use();
+    shader->SetUniform("projection", projection);
 }
 
 void AdaptToWindow(int& width, int& height, int winW, int winH)
@@ -26,12 +26,17 @@ void AdaptToWindow(int& width, int& height, int winW, int winH)
 	}
 }
 
-void SetWindowBorderColor(GLFWwindow* window, COLORREF color)
-{
-    HWND hwnd = glfwGetWin32Window(window);
-    if (hwnd)
-    {
-        BOOL enable = TRUE; // 设置窗口的属性
-        DwmSetWindowAttribute(hwnd, DWMWA_BORDER_COLOR, &color, sizeof(color));
-    }
-}
+//void SetWindowBorderColor(GLFWwindow* window, COLORREF color)
+//{
+//    HWND hwnd = glfwGetWin32Window(window);
+//    if (hwnd)
+//    {
+//        BOOL enable = TRUE; // 设置窗口的属性
+//        HRESULT hr = DwmSetWindowAttribute(hwnd, DWMWA_BORDER_COLOR, &color, sizeof(color));
+//        if (FAILED(hr))
+//        {
+//            // 处理错误
+//            std::cerr << "Failed to set window border color, HRESULT: " << hr << std::endl;
+//        }
+//    }
+//}

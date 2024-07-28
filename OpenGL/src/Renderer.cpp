@@ -8,7 +8,7 @@ Renderer& Renderer::getInstance()
 
 void Renderer::DrawElements(const VertexArray& va, const IndexBuffer& ib, const Shader& shader) const
 {
-	shader.Bind();
+	shader.Use();
 	va.Bind();
 	ib.Bind();
 	GLCall(glDrawElements(GL_TRIANGLES, ib.GetCount(), GL_UNSIGNED_INT, nullptr));
@@ -16,7 +16,7 @@ void Renderer::DrawElements(const VertexArray& va, const IndexBuffer& ib, const 
 
 void Renderer::DrawArrays(const VertexArray& va, const Shader& shader, GLenum mode, GLint first, GLsizei count) const
 {
-	shader.Bind();
+	shader.Use();
 	va.Bind();
 	GLCall(glDrawArrays(mode, first, count));
 }

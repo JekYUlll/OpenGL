@@ -24,7 +24,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 // 图片尽可能填充窗口
 void AdaptToWindow(int& width, int& height, int winW, int WinH);
 // 把窗口边框设置为黑色。没生效
-void SetWindowBorderColor(GLFWwindow* window, COLORREF color);
+// void SetWindowBorderColor(GLFWwindow* window, COLORREF color);
 
 #endif // !WINDOW_H
 

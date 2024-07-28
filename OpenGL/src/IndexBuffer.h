@@ -2,7 +2,7 @@
 #define INDEXBUFFER_H
 #include "Debug.h"
 
-class IndexBuffer 
+class IndexBuffer
 {
 private:
 	unsigned int _rendererID;

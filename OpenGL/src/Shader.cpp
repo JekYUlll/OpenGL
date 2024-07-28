@@ -5,6 +5,9 @@ Shader::Shader(const std::string& filepath)
 {
     ShaderProgramSources source = ReadShader(filepath);
     this->_rendererID = CreateShader(source.VertexSource, source.FragmentSource);
+#ifdef _DEBUG
+    std::cout << "Shader created with ID: " << _rendererID << std::endl;
+#endif // _DEBUG
 }
 
 Shader::Shader(const GLchar* vertexPath, const GLchar* fragmentPath)
@@ -22,6 +25,9 @@ Shader::Shader(const std::string& vertexShader, const std::string& fragmentShade
 
 Shader::~Shader()
 {
+#ifdef _DEBUG
+    std::cerr << "[shader distroyed]" << std::endl;
+#endif // _DEBUG
     GLCall(glDeleteProgram(this->_rendererID));
 }
 
@@ -132,19 +138,45 @@ unsigned int Shader::CompileShader(unsigned int type, const std::string& source)
     return id;
 }
 
-void Shader::PrintShader(const std::string& vertexShader, const std::string& fragmentShader)
+void Shader::GLCheckError() const
 {
+    GLenum error;
+    while ((error = glGetError()) != GL_NO_ERROR) {
+        std::cerr << "[OpenGL Error] (" << error << "): " << GetErrorString(error) << std::endl;
+    }
+}
+
+std::string Shader::GetErrorString(GLenum error) const
+{
+    switch (error) {
+    case GL_INVALID_ENUM: return "GL_INVALID_ENUM";
+    case GL_INVALID_VALUE: return "GL_INVALID_VALUE";
+    case GL_INVALID_OPERATION: return "GL_INVALID_OPERATION";
+    case GL_STACK_OVERFLOW: return "GL_STACK_OVERFLOW";
+    case GL_STACK_UNDERFLOW: return "GL_STACK_UNDERFLOW";
+    case GL_OUT_OF_MEMORY: return "GL_OUT_OF_MEMORY";
+    case GL_INVALID_FRAMEBUFFER_OPERATION: return "GL_INVALID_FRAMEBUFFER_OPERATION";
+    default: return "Unknown Error";
+    }
+}
+
+void Shader::PrintShader(const std::string& vertexShader, const std::string& fragmentShader) const
+{
+#ifdef PRINT_SHADER
     std::cout << "[VERTEX]" << std::endl;
     std::cout << vertexShader << std::endl;
     std::cout << "[FRAGMENT]" << std::endl;
     std::cout << fragmentShader << std::endl;
+#else 
+    return;
+#endif // !PRINT_SHADER
 }
 
 unsigned int Shader::CreateShader(const std::string& vertexShader, const std::string& fragmentShader)
 {
-    GLuint shaderProgram = glCreateProgram();
-    GLuint vs = CompileShader(GL_VERTEX_SHADER, vertexShader);
-    GLuint fs = CompileShader(GL_FRAGMENT_SHADER, fragmentShader);
+    unsigned int shaderProgram = glCreateProgram();
+    unsigned int vs = CompileShader(GL_VERTEX_SHADER, vertexShader);
+    unsigned int fs = CompileShader(GL_FRAGMENT_SHADER, fragmentShader);
 
     GLCall(glAttachShader(shaderProgram, vs));
     GLCall(glAttachShader(shaderProgram, fs));
@@ -159,37 +191,91 @@ unsigned int Shader::CreateShader(const std::string& vertexShader, const std::st
     return shaderProgram;
 }
 
-void Shader::Bind() const
+void Shader::Use() const
 {
     GLCall(glUseProgram(_rendererID));
+
+    GLCheckError();
+#ifdef _DEBUG
+    /*GLint currentProgram;
+    glGetIntegerv(GL_CURRENT_PROGRAM, &currentProgram);
+    if (currentProgram != this->_rendererID) {
+        std::cerr << "Failed to use shader program ID: " << _rendererID << std::endl;
+    }*/
+#endif // _DEBUG
 }
 
-void Shader::Unbind() const
+void Shader::UnUse() const
 {
     GLCall(glUseProgram(0));
 }
 
-void Shader::SetUniform4f(const std::string& name, float v0, float v1, float v2, float v3)
+void Shader::SetUniform(const std::string& name, float v0, float v1, float v2) const
+{
+    GLCall(glUniform3f(GetUniformLocation(name), v0, v1, v2));
+}
+
+void Shader::SetUniform(const std::string& name, float v0, float v1, float v2, float v3) const
 {
     GLCall(glUniform4f(GetUniformLocation(name), v0, v1, v2, v3));
 }
 
-void Shader::SetUniform1f(const std::string& name, float value)
+template<>
+void Shader::SetUniform<int>(const std::string& name, const int& value) const
 {
-    GLCall(glUniform1f(GetUniformLocation(name), value));
+    glUniform1i(GetUniformLocation(name), value);
 }
 
-void Shader::SetUniform1i(const std::string& name, int value)
+template<>
+void Shader::SetUniform<unsigned int>(const std::string& name, const unsigned int& value) const
 {
-    GLCall(glUniform1i(GetUniformLocation(name), value));
+    // glUniform1i(static_cast<unsigned int>(GetUniformLocation(name)), value); // ’˝»∑–‘¥Ê“…
+    glUniform1i(GetUniformLocation(name), static_cast<unsigned int>(value));
 }
 
-void Shader::SetUniformMat4f(const std::string& name, const glm::mat4& matrix)
+template<>
+void Shader::SetUniform<float>(const std::string& name, const float& value) const
 {
-    GLCall(glUniformMatrix4fv(GetUniformLocation(name), 1, GL_FALSE, &matrix[0][0]));
+    glUniform1f(GetUniformLocation(name), value);
 }
 
-int Shader::GetUniformLocation(const std::string& name)
+template<>
+void Shader::SetUniform<bool>(const std::string& name, const bool& value) const
+{
+    glUniform1i(GetUniformLocation(name), (int)value);
+}
+
+template<>
+void Shader::SetUniform<glm::vec2>(const std::string& name, const glm::vec2& value) const
+{
+    glUniform2f(GetUniformLocation(name), value.x, value.y);
+}
+
+template<>
+void Shader::SetUniform<glm::vec3>(const std::string& name, const glm::vec3& value) const
+{
+    glUniform3f(GetUniformLocation(name), value.x, value.y, value.z);
+}
+
+template<>
+void Shader::SetUniform<glm::vec4>(const std::string& name, const glm::vec4& value) const
+{
+    glUniform4f(GetUniformLocation(name), value.x, value.y, value.z, value.w);
+}
+
+template<>
+void Shader::SetUniform<glm::mat3>(const std::string& name, const glm::mat3& matrix) const
+{
+    glUniformMatrix3fv(GetUniformLocation(name), 1, GL_FALSE, &matrix[0][0]);
+}
+
+template<>
+void Shader::SetUniform<glm::mat4>(const std::string& name, const glm::mat4& matrix) const
+{
+    glUniformMatrix4fv(GetUniformLocation(name), 1, GL_FALSE, &matrix[0][0]);
+}
+
+int Shader::GetUniformLocation(const std::string& name) const
 {
     if (_uniformLocationCache.find(name) != _uniformLocationCache.end())
         return _uniformLocationCache[name];
